@@ -1,50 +1,181 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var currentUser = ViewBag.CurrentUser ?? "User";
+    var currentRole = ViewBag.CurrentRole ?? "Admin";
+    var userInitials = ViewBag.UserInitials ?? "U";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - WebUI</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/WebUI.styles.css" asp-append-version="true" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Store Management System</title>
+
+    <!-- Local Bootstrap CSS -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Local Font Awesome -->
+    <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+
+    <!-- Main layout CSS -->
+    <link href="~/css/MainLayout.css" rel="stylesheet" />
+
+    @RenderSection("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebUI</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="@Url.Action("Index", "Home")" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <span class="logo-text">Store Manager</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <!-- Main Section -->
+            <div class="nav-section">
+                <div class="nav-section-title">Main</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Index", "Home")" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Inventory Section (Admin Only) -->
+            @if (ViewBag.CurrentRole == "Admin")
+            {
+                <div class="nav-section">
+                    <div class="nav-section-title">Inventory</div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Vendors")" class="nav-link">
+                            <i class="fas fa-industry"></i>
+                            <span>Vendors</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Products")" class="nav-link">
+                            <i class="fas fa-tshirt"></i>
+                            <span>Products</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Purchases")" class="nav-link">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Purchases</span>
+                        </a>
+                    </div>
+                </div>
+            }
+
+            <!-- Sales Section -->
+            <div class="nav-section">
+                <div class="nav-section-title">Sales</div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Index", "Sales")" class="nav-link">
+                        <i class="fas fa-cash-register"></i>
+                        <span>Point of Sale</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="@Url.Action("Index", "Returns")" class="nav-link">
+                        <i class="fas fa-undo"></i>
+                        <span>Returns</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            @if (ViewBag.CurrentRole == "Admin")
+            {
+                <div class="nav-section">
+                    <div class="nav-section-title">Reports</div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Sales", "Reports")" class="nav-link">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Sales Reports</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Inventory", "Reports")" class="nav-link">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventory Reports</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- System Section (Admin Only) -->
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Users")" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Users</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Backup")" class="nav-link">
+                            <i class="fas fa-database"></i>
+                            <span>Backup & Restore</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="@Url.Action("Index", "Settings")" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </div>
+                </div>
+            }
+
+            <!-- Logout -->
+            <div class="nav-section">
+                <div class="nav-item">
+                    <a href="@Url.Action("Logout", "Account")" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
                 </div>
             </div>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    </aside>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - WebUI - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-left">
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="header-title">@ViewBag.Title</h1>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+        <div class="header-right">
+            <div class="user-info">
+                <div class="user-avatar">@userInitials</div>
+                <div class="user-details">
+                    <span class="user-name">@currentUser</span>
+                    <span class="user-role">@currentRole</span>
+                </div>
+                <i class="fas fa-chevron-down" style="color: #64748b; font-size: 0.75rem;"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <!-- Local JS -->
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/layout.js"></script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

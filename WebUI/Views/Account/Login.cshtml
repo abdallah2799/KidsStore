@@ -1,0 +1,128 @@
+﻿@{
+    Layout = null;
+}
+
+@model WebUI.Models.LoginViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Store Management System</title>
+
+    <!-- Local Bootstrap CSS -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Local Font Awesome -->
+    <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+
+    <!-- Login layout CSS -->
+    <link href="~/css/LoginStyle.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h1 class="login-title">Store Manager</h1>
+                <p class="login-subtitle">Sign in to your account</p>
+            </div>
+
+            <!-- Body -->
+            <div class="login-body">
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle alert-icon"></i>
+                        <span>@ViewBag.ErrorMessage</span>
+                    </div>
+                }
+
+                <form asp-action="Login" asp-controller="Account" method="post" id="loginForm">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label asp-for="UserName" class="form-label"></label>
+                        <div class="input-group-custom">
+                            <i class="fas fa-user input-icon"></i>
+                            <input asp-for="UserName" class="form-control" placeholder="Enter your username" autofocus />
+                        </div>
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label asp-for="Password" class="form-label"></label>
+                        <div class="input-group-custom">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label"></label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Sign In</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="login-footer">
+                <p>&copy; @DateTime.Now.Year Store Management System. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Validation Scripts -->
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('Password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Form submission handling
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            const btn = document.getElementById('loginBtn');
+            const btnContent = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div><span>Signing in...</span>';
+
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                btn.disabled = false;
+                btn.innerHTML = btnContent;
+            }
+        });
+    </script>
+</body>
+</html>

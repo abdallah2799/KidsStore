@@ -1,8 +1,358 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isAdmin = ViewBag.CurrentRole?.ToString() == "Admin";
+    var isCashier = ViewBag.CurrentRole?.ToString() == "Cashier";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<link href="~/css/IndexStyle.css" rel="stylesheet" />
+
+@if (isCashier)
+{
+    <!-- CASHIER DASHBOARD -->
+    <!-- Welcome Banner -->
+    <div class="welcome-banner">
+        <h1 class="welcome-title">Welcome, @ViewBag.CurrentUser!</h1>
+        <p class="welcome-subtitle">Ready to start your shift? Let's make it a great day!</p>
+    </div>
+
+    <!-- Cashier Stats -->
+    <div class="stats-grid">
+        <!-- Today's Sales -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon blue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+            </div>
+            <div class="stat-title">Your Sales Today</div>
+            <div class="stat-value">$847</div>
+            <div class="stat-subtitle">8 transactions completed</div>
+        </div>
+
+        <!-- Today's Returns -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon orange">
+                    <i class="fas fa-undo"></i>
+                </div>
+            </div>
+            <div class="stat-title">Returns Today</div>
+            <div class="stat-value">2</div>
+            <div class="stat-subtitle">Total value: $156</div>
+        </div>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="cashier-actions">
+        <a href="@Url.Action("Index", "Sales")" class="action-card primary">
+            <div class="action-icon">
+                <i class="fas fa-cash-register"></i>
+            </div>
+            <div class="action-title">New Sale</div>
+            <div class="action-description">Start a new transaction</div>
+        </a>
+
+        <a href="@Url.Action("Index", "Returns")" class="action-card success">
+            <div class="action-icon">
+                <i class="fas fa-undo"></i>
+            </div>
+            <div class="action-title">Process Return</div>
+            <div class="action-description">Handle product returns</div>
+        </a>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-history" style="color: #2563eb;"></i>
+                Your Recent Sales
+            </h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Invoice #</th>
+                        <th>Time</th>
+                        <th>Items</th>
+                        <th>Payment</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>#INV-0842</strong></td>
+                        <td>10:24 AM</td>
+                        <td>3 items</td>
+                        <td><span class="badge badge-success">Cash</span></td>
+                        <td><strong>$125.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>#INV-0841</strong></td>
+                        <td>10:15 AM</td>
+                        <td>2 items</td>
+                        <td><span class="badge badge-success">Card</span></td>
+                        <td><strong>$89.50</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>#INV-0840</strong></td>
+                        <td>10:02 AM</td>
+                        <td>5 items</td>
+                        <td><span class="badge badge-success">Cash</span></td>
+                        <td><strong>$234.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>#INV-0839</strong></td>
+                        <td>9:47 AM</td>
+                        <td>1 item</td>
+                        <td><span class="badge badge-success">Card</span></td>
+                        <td><strong>$45.00</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>#INV-0838</strong></td>
+                        <td>9:32 AM</td>
+                        <td>4 items</td>
+                        <td><span class="badge badge-success">Cash</span></td>
+                        <td><strong>$178.50</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else if (isAdmin)
+{
+    <!-- ADMIN DASHBOARD -->
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <!-- Today's Sales -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon blue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12.5%</span>
+                </div>
+            </div>
+            <div class="stat-title">Today's Sales</div>
+            <div class="stat-value">$2,547</div>
+            <div class="stat-subtitle">15 transactions today</div>
+        </div>
+
+        <!-- Total Profit -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon green">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8.3%</span>
+                </div>
+            </div>
+            <div class="stat-title">Total Profit (Month)</div>
+            <div class="stat-value">$12,458</div>
+            <div class="stat-subtitle">From 342 sales</div>
+        </div>
+
+        <!-- Total Products -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon orange">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="stat-trend down">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>3.2%</span>
+                </div>
+            </div>
+            <div class="stat-title">Total Products</div>
+            <div class="stat-value">1,284</div>
+            <div class="stat-subtitle">42 low stock items</div>
+        </div>
+
+        <!-- Low Stock Alert -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon red">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            <div class="stat-title">Low Stock Items</div>
+            <div class="stat-value">42</div>
+            <div class="stat-subtitle">Action required</div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Top Selling Products -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-fire" style="color: #f59e0b;"></i>
+                    Top Selling Products
+                </h2>
+                <a href="@Url.Action("Sales", "Reports")" class="card-action">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Sold</th>
+                            <th>Stock</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="product-name">Blue Denim Jacket</div>
+                                <div class="product-category">Outerwear</div>
+                            </td>
+                            <td>Kids</td>
+                            <td><strong>142</strong></td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td><strong>$3,550</strong></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-name">Cotton T-Shirt Set</div>
+                                <div class="product-category">Casual</div>
+                            </td>
+                            <td>Kids</td>
+                            <td><strong>128</strong></td>
+                            <td><span class="badge badge-warning">Low Stock</span></td>
+                            <td><strong>$2,560</strong></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-name">Summer Shorts</div>
+                                <div class="product-category">Casual</div>
+                            </td>
+                            <td>Kids</td>
+                            <td><strong>95</strong></td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td><strong>$1,900</strong></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-name">Winter Coat</div>
+                                <div class="product-category">Outerwear</div>
+                            </td>
+                            <td>Kids</td>
+                            <td><strong>87</strong></td>
+                            <td><span class="badge badge-success">In Stock</span></td>
+                            <td><strong>$4,350</strong></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="product-name">Sports Hoodie</div>
+                                <div class="product-category">Activewear</div>
+                            </td>
+                            <td>Kids</td>
+                            <td><strong>76</strong></td>
+                            <td><span class="badge badge-danger">Out of Stock</span></td>
+                            <td><strong>$2,280</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Low Stock Alerts & Quick Actions -->
+        <div>
+            <!-- Low Stock Alerts -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-exclamation-circle" style="color: #dc2626;"></i>
+                        Low Stock Alerts
+                    </h2>
+                    <a href="@Url.Action("Index", "Products")" class="card-action">
+                        View All
+                    </a>
+                </div>
+
+                <div class="alert-item">
+                    <div class="alert-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-title">Red T-Shirt - Size M</div>
+                        <div class="alert-subtitle">Only 5 items left</div>
+                    </div>
+                </div>
+
+                <div class="alert-item">
+                    <div class="alert-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-title">Blue Jeans - Size 32</div>
+                        <div class="alert-subtitle">Only 3 items left</div>
+                    </div>
+                </div>
+
+                <div class="alert-item">
+                    <div class="alert-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-title">Black Hoodie - Size L</div>
+                        <div class="alert-subtitle">Only 2 items left</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header" style="margin-bottom: 0;">
+                    <h2 class="card-title">
+                        <i class="fas fa-bolt" style="color: #f59e0b;"></i>
+                        Quick Actions
+                    </h2>
+                </div>
+
+                <div class="quick-actions">
+                    <a href="@Url.Action("Index", "Sales")" class="quick-action-btn">
+                        <i class="fas fa-cash-register"></i>
+                        <span>New Sale</span>
+                    </a>
+                    <a href="@Url.Action("Index", "Products")" class="quick-action-btn">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Add Product</span>
+                    </a>
+                    <a href="@Url.Action("Index", "Vendors")" class="quick-action-btn">
+                        <i class="fas fa-truck"></i>
+                        <span>New Purchase</span>
+                    </a>
+                    <a href="@Url.Action("Sales", "Reports")" class="quick-action-btn">
+                        <i class="fas fa-file-alt"></i>
+                        <span>View Reports</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Fallback if role not recognized -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Welcome to Store Manager</h2>
+        </div>
+        <p>Please contact your administrator to verify your account role.</p>
+    </div>
+}
