@@ -7,5 +7,8 @@ public class SalesInvoice : BaseEntity
     public string PaymentMethod { get; set; } = "Cash"; // Cash / Transaction
     public bool IsReturned { get; set; } = false;
 
+    public int SellerId { get; set; }
+
     public virtual ICollection<SalesItem> Items { get; set; } = [];
+    public virtual User Seller { get; set; } = null!;
 }

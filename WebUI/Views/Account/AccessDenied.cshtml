@@ -1,0 +1,83 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied - Store Management System</title>
+
+    <!-- Local Bootstrap CSS -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Local Font Awesome -->
+    <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .denied-card {
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .denied-icon {
+            font-size: 4rem;
+            color: #ef4444;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            color: #64748b;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        a.btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            border-radius: 0.5rem;
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+        }
+
+            a.btn-primary:hover {
+                background-color: #0b5ed7;
+            }
+    </style>
+</head>
+<body>
+    <div class="denied-card animate__animated animate__fadeIn">
+        <div class="denied-icon">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h2>Access Denied</h2>
+        <p>You don’t have permission to view this page.<br />Please contact your administrator if you think this is a mistake.</p>
+        <a href="@Url.Action("Login", "Account")" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt me-2"></i> Back to Login
+        </a>
+    </div>
+
+    <!-- Local Bootstrap JS -->
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -2,7 +2,6 @@
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Threading.Tasks;
 
 public class AccountService : IAccountService
@@ -26,14 +25,7 @@ public class AccountService : IAccountService
         if (user is null || !user.VerifyPassword(password))
             return null;
 
-        var httpContext = _httpContextAccessor.HttpContext!;
-        var session = httpContext.Session;
-
-        // Save data in session
-        session.SetInt32("UserId", user.Id);
-        session.SetString("UserName", user.UserName);
-        session.SetString("UserRole", user.Role.ToString());
-
+        // مفيش تخزين في Session هنا — CookieAuth بيتكفل بكل حاجة
         return user;
     }
 
@@ -50,7 +42,8 @@ public class AccountService : IAccountService
         var user = new User
         {
             UserName = username,
-            Role = role
+            Role = role,
+            IsActive = true
         };
 
         user.SetPassword(password);
@@ -63,14 +56,6 @@ public class AccountService : IAccountService
 
     public Task LogoutAsync()
     {
-        var httpContext = _httpContextAccessor.HttpContext!;
-        httpContext.Session.Clear();
-
-        // Remove cookies if exist
-        httpContext.Response.Cookies.Delete("UserId");
-        httpContext.Response.Cookies.Delete("UserName");
-        httpContext.Response.Cookies.Delete("UserRole");
-
         return Task.CompletedTask;
     }
 }

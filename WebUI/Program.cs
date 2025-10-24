@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 using System.Collections.ObjectModel;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,16 +66,34 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// 🔹 Proper Cookie Authentication
+// ✅ Proper Cookie Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.ExpireTimeSpan = TimeSpan.FromDays(7); // Remember Me
         options.SlidingExpiration = true;
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnSigningIn = context =>
+            {
+                // Log sign-in event (optional)
+                Log.Information($"User '{context?.Principal?.Identity?.Name}' signed in.");
+                return Task.CompletedTask;
+            }
+        };
     });
+
+// ✅ Authorization Policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("CashierOnly", policy => policy.RequireRole("Cashier"));
+    options.AddPolicy("AdminOrCashier", policy => policy.RequireRole("Admin", "Cashier"));
+
+});
 
 // ==========================================
 // 4. Build App
@@ -94,48 +113,14 @@ else
     app.UseDeveloperExceptionPage();
 }
 
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.MapStaticAssets();
 app.UseRouting();
 
-// 🔹 Correct order: Session → Authentication → Authorization
+// ✅ Correct order: Session → Authentication → Authorization
 app.UseSession();
-// Rehydrate session from cookies
-app.Use(async (context, next) =>
-{
-    var session = context.Session;
-    var cookies = context.Request.Cookies;
-
-    if (session.GetInt32("UserId") is null &&
-        cookies.TryGetValue("UserId", out var userId) &&
-        cookies.TryGetValue("UserName", out var userName) &&
-        cookies.TryGetValue("UserRole", out var userRole))
-    {
-        session.SetInt32("UserId", int.Parse(userId));
-        session.SetString("UserName", userName);
-        session.SetString("UserRole", userRole);
-    }
-
-    await next();
-});
-
-// Refresh cookies if active
-app.Use(async (context, next) =>
-{
-    var cookies = context.Request.Cookies;
-    if (cookies.ContainsKey("UserId"))
-    {
-        var opts = new CookieOptions
-        {
-            Expires = DateTime.UtcNow.AddDays(7),
-            HttpOnly = true,
-            Secure = false
-        };
-        context.Response.Cookies.Append("UserId", cookies["UserId"]!, opts);
-        context.Response.Cookies.Append("UserName", cookies["UserName"]!, opts);
-        context.Response.Cookies.Append("UserRole", cookies["UserRole"]!, opts);
-    }
-    await next();
-});
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -145,7 +130,7 @@ app.UseAuthorization();
 // ==========================================
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
+    pattern: "{controller=Account}/{action=Login}/{id?}"
 ).WithStaticAssets();
 
 // ==========================================
@@ -156,7 +141,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     Log.Information("Seeding started");
 
-    context.Database.Migrate(); // Ensure DB & schema exist
+    context.Database.Migrate();
 
     if (!context.Users.Any())
     {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -17,20 +19,32 @@ namespace Domain.Entities
         public UserRole Role { get; set; }
         public bool IsActive { get; set; } = true;
 
+        public virtual ICollection<SalesInvoice> SalesInvoices { get; set; } = new List<SalesInvoice>();
+
+        // Constants for hashing
+        [NotMapped] private const int SaltSize = 16;
+        [NotMapped] private const int KeySize = 32;
+        [NotMapped] private const int Iterations = 100_000;
+        [NotMapped] private static readonly HashAlgorithmName HashAlgorithm = HashAlgorithmName.SHA512;
+
         // Utility methods
+        
         public void SetPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            PasswordHash = Convert.ToBase64String(sha256.ComputeHash(bytes));
+            var salt = RandomNumberGenerator.GetBytes(SaltSize);
+            var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithm, KeySize);
+            PasswordHash = Convert.ToBase64String(salt) + ":" + Convert.ToBase64String(hash);
         }
-
         public bool VerifyPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = Convert.ToBase64String(sha256.ComputeHash(bytes));
-            return hash == PasswordHash;
+            var parts = PasswordHash.Split(':');
+            if (parts.Length != 2) return false;
+
+            var salt = Convert.FromBase64String(parts[0]);
+            var storedHash = Convert.FromBase64String(parts[1]);
+            var hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, Iterations, HashAlgorithm, KeySize);
+
+            return CryptographicOperations.FixedTimeEquals(hash, storedHash);
         }
     }
 }
