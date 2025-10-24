@@ -21,6 +21,63 @@ body {
 }
 
 /* Header */
+/* 🧩 User Dropdown Menu */
+.user-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px); /* يرفع شوية تحت الافاتار */
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    min-width: 180px;
+    z-index: 1000;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+
+    .user-dropdown.show {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: background 0.2s ease;
+}
+
+    .dropdown-item:hover {
+        background: #f3f4f6;
+        color: #111827;
+    }
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-avatar {
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+}
+
 .main-header {
     position: fixed;
     top: 0;
@@ -79,7 +136,7 @@ body {
         background: #e2e8f0;
     }
 
-.user-avatar {
+/*.user-avatar {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -89,7 +146,7 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 600;
-}
+}*/
 
 .user-details {
     display: flex;
@@ -284,4 +341,50 @@ body.sidebar-collapsed .main-content {
     .user-details {
         display: none;
     }
+}
+
+/* Shared Modal Helper Styles */
+.shared-modal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.shared-modal .modal-header {
+    border-bottom: none;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.shared-modal .modal-body {
+    font-size: 0.95rem;
+    color: #1e293b;
+}
+
+.shared-modal .modal-footer button {
+    min-width: 80px;
+    font-size: 0.875rem;
+}
+
+.shared-modal .modal-header.bg-primary {
+    background-color: #2563eb;
+}
+
+.shared-modal .modal-header.bg-success {
+    background-color: #16a34a;
+}
+
+.shared-modal .modal-header.bg-warning {
+    background-color: #facc15;
+}
+
+.shared-modal .modal-header.bg-danger {
+    background-color: #dc2626;
+}
+
+.shared-modal .btn-close-white {
+    filter: brightness(0) invert(1);
 }

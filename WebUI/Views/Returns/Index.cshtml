@@ -1,0 +1,29 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var userName = User.Identity?.Name ?? "Guest";
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Unknown";
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Unknown";
+}
+
+<div class="d-flex flex-column align-items-center justify-content-center" style="height:80vh;">
+    <h1 style="font-weight:700; color:#2563eb;">@controllerName</h1>
+
+    <p style="font-size:1.2rem; margin-top:10px;">
+        Logged in as:
+        <span style="font-weight:600; color:#16a34a;">@userName</span>
+        (<span style="color:#64748b;">@role</span>)
+    </p>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <p style="color:#334155; margin-top:15px;">You have full administrative access to this module.</p>
+    }
+    else if (User.IsInRole("Cashier"))
+    {
+        <p style="color:#f59e0b; margin-top:15px;">Limited cashier access — certain actions may be restricted.</p>
+    }
+    else
+    {
+        <p style="color:#dc2626; margin-top:15px;">Unknown or unauthorized role.</p>
+    }
+</div>

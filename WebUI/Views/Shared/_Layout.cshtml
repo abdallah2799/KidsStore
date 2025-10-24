@@ -1,7 +1,12 @@
-﻿@{
-    var currentUser = ViewBag.CurrentUser ?? "User";
-    var currentRole = ViewBag.CurrentRole ?? "Admin";
-    var userInitials = ViewBag.UserInitials ?? "U";
+﻿@using System.Security.Claims
+@{
+    var user = User;
+    var isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
+    var currentUser = isAuthenticated ? user?.Identity?.Name : "Guest";
+    var currentRole = isAuthenticated ? user?.FindFirst(ClaimTypes.Role)?.Value ?? "Unknown" : "Guest";
+    var userInitials = isAuthenticated && !string.IsNullOrEmpty(currentUser)
+        ? string.Concat(currentUser.Take(2)).ToUpper()
+        : "U";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -10,172 +15,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Store Management System</title>
 
-    <!-- Local Bootstrap CSS -->
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <!-- Local Font Awesome -->
     <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
-
-    <!-- Main layout CSS -->
     <link href="~/css/MainLayout.css" rel="stylesheet" />
-
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <a href="@Url.Action("Index", "Home")" class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-store"></i>
-                </div>
-                <span class="logo-text">Store Manager</span>
-            </a>
-        </div>
-
-        <nav class="sidebar-nav">
-            <!-- Main Section -->
-            <div class="nav-section">
-                <div class="nav-section-title">Main</div>
-                <div class="nav-item">
-                    <a href="@Url.Action("Index", "Home")" class="nav-link">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </div>
+    @if (isAuthenticated)
+    {
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="@Url.Action("Index", "Home")" class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <span class="logo-text">Store Manager</span>
+                </a>
             </div>
 
-            <!-- Inventory Section (Admin Only) -->
-            @if (ViewBag.CurrentRole == "Admin")
-            {
+            <nav class="sidebar-nav">
                 <div class="nav-section">
-                    <div class="nav-section-title">Inventory</div>
+                    <div class="nav-section-title">Main</div>
                     <div class="nav-item">
-                        <a href="@Url.Action("Index", "Vendors")" class="nav-link">
-                            <i class="fas fa-industry"></i>
-                            <span>Vendors</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="@Url.Action("Index", "Products")" class="nav-link">
-                            <i class="fas fa-tshirt"></i>
-                            <span>Products</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="@Url.Action("Index", "Purchases")" class="nav-link">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span>Purchases</span>
+                        <a href="@Url.Action("Index", "Home")" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
                         </a>
                     </div>
                 </div>
-            }
 
-            <!-- Sales Section -->
-            <div class="nav-section">
-                <div class="nav-section-title">Sales</div>
-                <div class="nav-item">
-                    <a href="@Url.Action("Index", "Sales")" class="nav-link">
-                        <i class="fas fa-cash-register"></i>
-                        <span>Point of Sale</span>
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="@Url.Action("Index", "Returns")" class="nav-link">
-                        <i class="fas fa-undo"></i>
-                        <span>Returns</span>
-                    </a>
-                </div>
-            </div>
+                @if (currentRole == "Admin")
+                {
+                    <div class="nav-section">
+                        <div class="nav-section-title">Inventory</div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Index", "Vendors")" class="nav-link">
+                                <i class="fas fa-industry"></i>
+                                <span>Vendors</span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Index", "Products")" class="nav-link">
+                                <i class="fas fa-tshirt"></i>
+                                <span>Products</span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Index", "Purchases")" class="nav-link">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Purchases</span>
+                            </a>
+                        </div>
+                    </div>
+                }
 
-            <!-- Reports Section -->
-            @if (ViewBag.CurrentRole == "Admin")
-            {
                 <div class="nav-section">
-                    <div class="nav-section-title">Reports</div>
+                    <div class="nav-section-title">Sales</div>
                     <div class="nav-item">
-                        <a href="@Url.Action("Sales", "Reports")" class="nav-link">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Sales Reports</span>
+                        <a href="@Url.Action("Index", "Sales")" class="nav-link">
+                            <i class="fas fa-cash-register"></i>
+                            <span>Point of Sale</span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="@Url.Action("Inventory", "Reports")" class="nav-link">
-                            <i class="fas fa-boxes"></i>
-                            <span>Inventory Reports</span>
+                        <a href="@Url.Action("Index", "Returns")" class="nav-link">
+                            <i class="fas fa-undo"></i>
+                            <span>Returns</span>
                         </a>
                     </div>
                 </div>
 
-                <!-- System Section (Admin Only) -->
+                @if (currentRole == "Admin")
+                {
+                    <div class="nav-section">
+                        <div class="nav-section-title">Reports</div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Sales", "Reports")" class="nav-link">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Sales Reports</span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Inventory", "Reports")" class="nav-link">
+                                <i class="fas fa-boxes"></i>
+                                <span>Inventory Reports</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="nav-section">
+                        <div class="nav-section-title">System</div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Index", "Users")" class="nav-link">
+                                <i class="fas fa-users"></i>
+                                <span>Users</span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Index", "Backup")" class="nav-link">
+                                <i class="fas fa-database"></i>
+                                <span>Backup & Restore</span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="@Url.Action("Index", "Settings")" class="nav-link">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+
                 <div class="nav-section">
-                    <div class="nav-section-title">System</div>
                     <div class="nav-item">
-                        <a href="@Url.Action("Index", "Users")" class="nav-link">
-                            <i class="fas fa-users"></i>
-                            <span>Users</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="@Url.Action("Index", "Backup")" class="nav-link">
-                            <i class="fas fa-database"></i>
-                            <span>Backup & Restore</span>
-                        </a>
-                    </div>
-                    <div class="nav-item">
-                        <a href="@Url.Action("Index", "Settings")" class="nav-link">
-                            <i class="fas fa-cog"></i>
-                            <span>Settings</span>
+                        <a href="@Url.Action("Logout", "Account")" class="nav-link">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
                         </a>
                     </div>
                 </div>
-            }
+            </nav>
+        </aside>
 
-            <!-- Logout -->
-            <div class="nav-section">
-                <div class="nav-item">
-                    <a href="@Url.Action("Logout", "Account")" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <header class="main-header">
+            <div class="header-left">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="header-title">@ViewBag.Title</h1>
+            </div>
+
+            <div class="header-right position-relative">
+                <div class="user-info" id="userDropdownToggle" style="cursor:pointer;">
+                    <div class="user-avatar">@userInitials</div>
+                    <div class="user-details">
+                        <span class="user-name">@currentUser</span>
+                        <span class="user-role">@currentRole</span>
+                    </div>
+                    <i class="fas fa-chevron-down" style="color: #64748b; font-size: 0.75rem;"></i>
+                </div>
+
+                <!-- Dropdown Menu -->
+                <div id="userDropdown" class="user-dropdown shadow-sm">
+                    <a href="@Url.Action("Index", "Settings")" class="dropdown-item">
+                        <i class="fas fa-cog me-2 text-primary"></i> Settings
+                    </a>
+                    <a href="@Url.Action("Logout", "Account")" class="dropdown-item text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
                     </a>
                 </div>
             </div>
-        </nav>
-    </aside>
 
-    <!-- Sidebar Overlay for Mobile -->
-    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+        </header>
+    }
 
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-left">
-            <button class="menu-toggle" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <h1 class="header-title">@ViewBag.Title</h1>
-        </div>
-
-        <div class="header-right">
-            <div class="user-info">
-                <div class="user-avatar">@userInitials</div>
-                <div class="user-details">
-                    <span class="user-name">@currentUser</span>
-                    <span class="user-role">@currentRole</span>
-                </div>
-                <i class="fas fa-chevron-down" style="color: #64748b; font-size: 0.75rem;"></i>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Area -->
     <main class="main-content">
         @RenderBody()
     </main>
 
-    <!-- Local JS -->
-    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/layout.js"></script>
+    <script src="@Url.Content("~/lib/bootstrap/dist/js/bootstrap.js")"></script>
+    <script src="@Url.Content("~/js/toastHelper.js")"></script>
+    <script src="@Url.Content("~/js/modalHelper.js")"></script>
+    <script src="@Url.Content("~/js/layout.js")"></script>
 
     @RenderSection("Scripts", required: false)
+
+
 </body>
 </html>

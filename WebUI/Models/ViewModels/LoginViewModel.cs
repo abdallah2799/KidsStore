@@ -1,9 +1,8 @@
-﻿using Domain.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebUI.Models
+namespace WebUI.Models.ViewModels
 {
-    public class RegisterViewModel
+    public class LoginViewModel
     {
         [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; } = string.Empty;
@@ -12,7 +11,7 @@ namespace WebUI.Models
         [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Role is required")]
-        public UserRole Role { get; set; } = UserRole.Cashier;
+        
+        public bool RememberMe { get; set; }
     }
 }
