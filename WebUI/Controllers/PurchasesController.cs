@@ -428,5 +428,262 @@ namespace WebUI.Controllers
                 return Json(Array.Empty<object>());
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewPurchaseInvoice(int id)
+        {
+            try
+            {
+                var invoice = await _purchaseService.GetInvoiceByIdWithDetailsAsync(id);
+                if (invoice == null)
+                {
+                    return NotFound();
+                }
+
+                var html = GeneratePurchaseInvoiceHtml(invoice);
+                return Content(html, "text/html");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error viewing purchase invoice");
+                return BadRequest($"Error viewing invoice: {ex.Message}");
+            }
+        }
+
+        private string GeneratePurchaseInvoiceHtml(PurchaseInvoice invoice)
+        {
+            var html = $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Purchase Invoice #{invoice.Id}</title>
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }}
+        .invoice {{
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            text-align: center;
+            border-bottom: 3px solid #4facfe;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }}
+        .header h1 {{
+            color: #4facfe;
+            margin: 0;
+            font-size: 32px;
+        }}
+        .header p {{
+            color: #666;
+            margin: 5px 0;
+        }}
+        .info-section {{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }}
+        .info-box {{
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }}
+        .info-box h3 {{
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+        }}
+        .info-box p {{
+            margin: 5px 0;
+            color: #666;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }}
+        th {{
+            background: #4facfe;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }}
+        td {{
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }}
+        tr:hover {{
+            background: #f8f9fa;
+        }}
+        .totals {{
+            text-align: right;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #dee2e6;
+        }}
+        .totals .total-row {{
+            display: flex;
+            justify-content: flex-end;
+            margin: 10px 0;
+        }}
+        .totals .total-label {{
+            margin-right: 20px;
+            font-weight: 600;
+            color: #666;
+        }}
+        .totals .total-value {{
+            min-width: 150px;
+            text-align: right;
+            font-weight: 700;
+            color: #333;
+        }}
+        .grand-total {{
+            font-size: 24px;
+            color: #4facfe !important;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-top: 10px;
+        }}
+        .footer {{
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }}
+        .no-print {{
+            text-align: center;
+            margin: 20px 0;
+        }}
+        .print-btn {{
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }}
+        .print-btn:hover {{
+            background: #3b8fd6;
+        }}
+        @media print {{
+            body {{
+                background: white;
+                margin: 0;
+                padding: 0;
+            }}
+            .invoice {{
+                box-shadow: none;
+                padding: 20px;
+            }}
+            .no-print {{
+                display: none;
+            }}
+        }}
+    </style>
+</head>
+<body>
+    <div class='invoice'>
+        <div class='header'>
+            <h1>🛒 PURCHASE INVOICE</h1>
+            <p>Invoice #: {invoice.Id}</p>
+            <p>Date: {invoice.PurchaseDate:MMMM dd, yyyy - hh:mm tt}</p>
+        </div>
+
+        <div class='info-section'>
+            <div class='info-box'>
+                <h3>📦 Store Information</h3>
+                <p><strong>Kids Store</strong></p>
+                <p>Business Management System</p>
+            </div>
+            <div class='info-box'>
+                <h3>🏢 Vendor Information</h3>
+                <p><strong>{invoice.Vendor?.Name ?? "N/A"}</strong></p>
+                <p>{invoice.Vendor?.ContactInfo ?? "N/A"}</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>Color</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>";
+
+            int itemNumber = 1;
+            foreach (var item in invoice.Items ?? Enumerable.Empty<PurchaseItem>())
+            {
+                var total = item.Quantity * item.BuyingPrice;
+                var productName = item.ProductVariant?.Product?.Description ?? "Unknown Product";
+                var color = item.ProductVariant?.Color ?? "N/A";
+                var size = item.ProductVariant?.Size ?? 0;
+
+                html += $@"
+                <tr>
+                    <td>{itemNumber++}</td>
+                    <td>{productName}</td>
+                    <td>{color}</td>
+                    <td>{size}</td>
+                    <td>{item.Quantity}</td>
+                    <td>${item.BuyingPrice:F2}</td>
+                    <td>${total:F2}</td>
+                </tr>";
+            }
+
+            html += $@"
+            </tbody>
+        </table>
+
+        <div class='totals'>
+            <div class='total-row grand-total'>
+                <span class='total-label'>TOTAL AMOUNT:</span>
+                <span class='total-value'>${invoice.TotalAmount:F2}</span>
+            </div>
+        </div>
+
+        <div class='footer'>
+            <p>Thank you for your business!</p>
+            <p>Purchase Invoice generated on {DateTime.Now:MMMM dd, yyyy}</p>
+        </div>
+    </div>
+
+    <div class='no-print'>
+        <button class='print-btn' onclick='window.print()'>🖨️ Print Invoice</button>
+    </div>
+
+    <script>
+        // Auto focus for printing
+        window.onload = function() {{
+            document.querySelector('.print-btn').focus();
+        }};
+    </script>
+</body>
+</html>";
+
+            return html;
+        }
     }
 }

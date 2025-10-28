@@ -5,6 +5,14 @@
     {
       "library": "font-awesome@7.0.1",
       "destination": "wwwroot/font-awesome/"
+    },
+    {
+      "library": "Chart.js@4.4.0",
+      "destination": "wwwroot/lib/chart.js/",
+      "files": [
+        "chart.umd.min.js",
+        "chart.umd.js"
+      ]
     }
   ]
 }
