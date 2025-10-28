@@ -49,7 +49,8 @@ builder.Host.UseSerilog();
 // 2. Core Services Registration
 // ==========================================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .UseLazyLoadingProxies()); // Enable lazy loading
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
@@ -59,6 +60,7 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
+builder.Services.AddScoped<Application.Interfaces.Services.IReportService, Application.Services.ReportService>();
 
 // ==========================================
 // 3. Session & Authentication Configuration

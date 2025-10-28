@@ -1,0 +1,122 @@
+/* Sales Page Styles */
+
+/* Ensure table container doesn't clip autocomplete */
+.table-responsive {
+    overflow: visible !important;
+}
+
+#salesTable {
+    position: relative;
+}
+
+#salesTable tbody tr td {
+    position: relative;
+}
+
+/* Product row inputs */
+.product-row input,
+.product-row select {
+    font-size: 0.875rem;
+}
+
+.product-code-input {
+    border: 2px solid #e5e7eb;
+    transition: border-color 0.2s;
+}
+
+.product-code-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.15);
+}
+
+.product-name-display {
+    background-color: #f8fafc;
+}
+
+.color-select,
+.size-select {
+    cursor: pointer;
+}
+
+.color-select:disabled,
+.size-select:disabled {
+    background-color: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.unit-price-display,
+.total-display {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.quantity-input,
+.discount-input {
+    text-align: center;
+}
+
+.remove-row-btn {
+    padding: 0.25rem 0.5rem;
+}
+
+.remove-row-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* Summary section */
+#subtotal,
+#totalDiscount,
+#tax,
+#netTotal,
+#change {
+    font-size: 1rem;
+}
+
+#netTotal {
+    font-size: 1.25rem;
+}
+
+/* Action buttons */
+#addRowBtn {
+    font-weight: 600;
+}
+
+/* Discount warning */
+#discountWarning {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    background-color: #fee2e2;
+    border-radius: 8px;
+    border-left: 4px solid #dc2626;
+}
+
+/* Product search modal */
+#productSearchModal .table-hover tbody tr {
+    cursor: pointer;
+}
+
+#productSearchModal .table-hover tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Payment method dropdown */
+#paymentMethod {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Responsive table */
+@media (max-width: 1400px) {
+    #salesTable th,
+    #salesTable td {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.25rem;
+    }
+
+    .product-row input,
+    .product-row select {
+        font-size: 0.75rem;
+    }
+}

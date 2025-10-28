@@ -1,5 +1,6 @@
 ﻿:root {
     --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
     --header-height: 65px;
     --primary-color: #2563eb;
     --primary-dark: #1e40af;
@@ -109,6 +110,26 @@ body {
     cursor: pointer;
 }
 
+.sidebar-collapse-toggle {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: #334155;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.sidebar-collapse-toggle:hover {
+    background: #f1f5f9;
+    color: var(--primary-color);
+}
+
+body.sidebar-collapsed .sidebar-collapse-toggle i {
+    transform: rotate(180deg);
+}
+
 .header-title {
     font-size: 1.25rem;
     font-weight: 600;
@@ -173,8 +194,9 @@ body {
     height: 100vh;
     background: var(--sidebar-bg);
     z-index: 1000;
-    transition: transform 0.3s ease;
+    transition: width 0.3s ease, transform 0.3s ease;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
     .sidebar::-webkit-scrollbar {
@@ -185,6 +207,36 @@ body {
         background: #475569;
         border-radius: 3px;
     }
+
+/* Collapsed sidebar state */
+body.sidebar-collapsed .sidebar {
+    width: var(--sidebar-collapsed-width);
+}
+
+body.sidebar-collapsed .logo-text,
+body.sidebar-collapsed .nav-section-title,
+body.sidebar-collapsed .nav-link span {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+body.sidebar-collapsed .nav-link {
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+body.sidebar-collapsed .nav-link i {
+    margin: 0;
+}
+
+body.sidebar-collapsed .main-header {
+    left: var(--sidebar-collapsed-width);
+}
+
+body.sidebar-collapsed .main-content {
+    margin-left: var(--sidebar-collapsed-width);
+}
 
 .sidebar-header {
     height: var(--header-height);
@@ -291,7 +343,7 @@ body.sidebar-collapsed .main-content {
 }
 
 /* Responsive */
-@@media (max-width: 992px) {
+@media (max-width: 992px) {
     .menu-toggle {
         display: block;
     }
@@ -329,7 +381,7 @@ body.sidebar-collapsed .main-content {
     }
 }
 
-@@media (max-width: 576px) {
+@media (max-width: 576px) {
     .main-content {
         padding: 1rem;
     }

@@ -299,10 +299,12 @@ function addProductBlock() {
             <div class="row align-items-center">
                 <div class="col-md-4">
                     <label class="form-label text-white mb-0 small">Product *</label>
-                    <input type="text" class="form-control form-control-sm product-search" 
-                           placeholder="Type product code or name..." autocomplete="off">
-                    <input type="hidden" class="product-id">
-                    <div class="dropdown-menu product-dropdown" style="width: 100%;"></div>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-sm product-search" 
+                               placeholder="Type product code or name..." autocomplete="off">
+                        <input type="hidden" class="product-id">
+                        <div class="dropdown-menu product-dropdown" style="width: 100%;"></div>
+                    </div>
                 </div>
                 <div class="col-md-2">
                     <label class="form-label text-white mb-0 small">Buying Price *</label>
@@ -1003,11 +1005,12 @@ function saveInvoice(e) {
         }
 
         for (const row of variantRows) {
-            const color = row.querySelector('.color-input').value.trim();
+            const colorName = row.querySelector('.color-input').value.trim();
+            const colorHex = row.querySelector('input[type="hidden"]').value.trim();
             const size = row.querySelector('.size-input').value.trim();
             const quantity = parseInt(row.querySelector('input[type="number"]').value);
 
-            if (!color || !size) {
+            if (!colorHex || !size) {
                 showError('Please fill all variant fields correctly');
                 return;
             }
@@ -1019,7 +1022,7 @@ function saveInvoice(e) {
 
             itemsData.push({
                 productId,
-                color,
+                color: colorHex, // Use hex value instead of name
                 size,
                 quantity,
                 buyingPrice,

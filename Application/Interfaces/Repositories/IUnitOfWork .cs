@@ -7,6 +7,7 @@ namespace Application.Interfaces.Repositories
         IRepository<User> Users { get; }
         IRepository<Product> Products { get; }
         IRepository<PurchaseInvoice> PurchaseInvoices { get; }
+        IRepository<SalesInvoice> SalesInvoices { get; }
 
         IRepository<T> Repository<T>() where T : class;
         // ... add others as needed

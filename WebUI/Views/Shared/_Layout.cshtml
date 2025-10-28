@@ -84,6 +84,12 @@
                             <span>Returns</span>
                         </a>
                     </div>
+                        <div class="nav-item">
+                                <a href="@Url.Action("Invoices", "Sales")" class="nav-link">
+                                    <i class="fas fa-file-invoice"></i>
+                                    <span>Invoices</span>
+                                </a>
+                        </div>
                 </div>
 
                 @if (currentRole == "Admin")
@@ -144,6 +150,9 @@
             <div class="header-left">
                 <button class="menu-toggle" onclick="toggleSidebar()">
                     <i class="fas fa-bars"></i>
+                </button>
+                <button class="sidebar-collapse-toggle" onclick="toggleSidebarCollapse()" title="Expand/Collapse Sidebar">
+                    <i class="fas fa-angles-left"></i>
                 </button>
                 <h1 class="header-title">@ViewBag.Title</h1>
             </div>

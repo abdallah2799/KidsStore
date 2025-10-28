@@ -20,6 +20,7 @@ namespace Infrastructure.Repositories
         public IRepository<User> Users => Repository<User>();
         public IRepository<Product> Products => Repository<Product>();
         public IRepository<PurchaseInvoice> PurchaseInvoices => Repository<PurchaseInvoice>();
+        public IRepository<SalesInvoice> SalesInvoices => Repository<SalesInvoice>();
 
         public IRepository<T> Repository<T>() where T : class
         {

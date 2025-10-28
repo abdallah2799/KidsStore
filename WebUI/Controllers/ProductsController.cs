@@ -36,6 +36,68 @@ namespace WebUI.Controllers
             return Json(new { available = !exists });
         }
 
+        // GET: /Products/GetByCode
+        [HttpGet]
+        [Authorize(Roles = "Admin,Cashier")] // Allow cashiers to access this for POS
+        public async Task<IActionResult> GetByCode(string code)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+                return BadRequest(new { message = "Code is required" });
+
+            var products = await _productService.GetAllWithDetailsAsync();
+            var product = products.FirstOrDefault(p => p.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+
+            if (product == null)
+                return NotFound(new { message = "Product not found" });
+
+            var result = new
+            {
+                id = product.Id,
+                code = product.Code,
+                description = product.Description,
+                sellingPrice = product.SellingPrice,
+                discountLimit = product.DiscountLimit ?? 0,
+                variants = product.Variants.Select(v => new
+                {
+                    id = v.Id,
+                    color = v.Color,
+                    size = v.Size,
+                    stock = v.Stock
+                }).ToList()
+            };
+
+            return Ok(result);
+        }
+
+        // GET: /Products/SearchProducts
+        [HttpGet]
+        [Authorize(Roles = "Admin,Cashier")]
+        public async Task<IActionResult> SearchProducts(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Ok(new List<object>());
+
+            var products = await _productService.GetAllWithDetailsAsync();
+
+            // Only show products with total stock > 0
+            var filtered = products
+                .Where(p => p.IsActive &&
+                    (p.Code.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                     p.Description.Contains(query, StringComparison.OrdinalIgnoreCase)) &&
+                    (p.Variants?.Sum(v => v.Stock) ?? 0) > 0)
+                .Take(10) // Limit to 10 results
+                .Select(p => new
+                {
+                    id = p.Id,
+                    code = p.Code,
+                    description = p.Description,
+                    sellingPrice = p.SellingPrice
+                })
+                .ToList();
+
+            return Ok(filtered);
+        }
+
         // GET: /Products/GetAll
         [HttpGet]
         public async Task<IActionResult> GetAll()
