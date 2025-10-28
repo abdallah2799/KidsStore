@@ -20,7 +20,10 @@ namespace Application.Services
             _configuration = configuration;
             
             // Use C:\KidsStoreBackups - accessible by SQL Server service
-            _backupDirectory = @"C:\KidsStoreBackups";
+            var configPath = configuration.GetValue<string>("BackupDirectory");
+            _backupDirectory = !string.IsNullOrWhiteSpace(configPath)
+                ? configPath
+                : @"D:\StoreBackups";
 
             // Ensure backup directory exists
             if (!Directory.Exists(_backupDirectory))
