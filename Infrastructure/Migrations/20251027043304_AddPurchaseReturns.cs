@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Deleted migration file
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable

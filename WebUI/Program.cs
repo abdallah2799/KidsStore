@@ -148,35 +148,6 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     Log.Information("Applying migrations and seeding data");
     await Infrastructure.Persistence.DbSeeder.SeedAsync(context);
-
-    if (!context.Users.Any())
-    {
-        var admin = new Domain.Entities.User
-        {
-            UserName = "admin",
-            Role = Domain.Entities.UserRole.Admin,
-            IsActive = true
-        };
-        admin.SetPassword("admin123");
-
-        var cashier = new Domain.Entities.User
-        {
-            UserName = "cashier",
-            Role = Domain.Entities.UserRole.Cashier,
-            IsActive = true
-        };
-        cashier.SetPassword("cashier123");
-
-        context.Users.AddRange(admin, cashier);
-        context.SaveChanges();
-
-        Log.Information("Default users seeded: admin / cashier");
-    }
-    else
-    {
-        Log.Information("Users already exist — skipping seeding");
-    }
-
     Log.Information("Seeding finished, starting app");
 }
 
