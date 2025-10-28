@@ -1,0 +1,404 @@
+/* Products Page Styles */
+
+/* Search Input */
+.search-input {
+    width: 320px;
+    border-radius: 50px;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    border-color: #2563eb;
+}
+
+/* Product Tabs */
+#productTabs {
+    border-bottom: none;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+#productTabs .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+    min-width: 140px;
+    color: #334155;
+    font-weight: 500;
+    border: none;
+    border-radius: 10px 10px 0 0;
+    background-color: #e2e8f0;
+    padding: 0 20px;
+    transition: all 0.2s ease;
+}
+
+#productTabs .nav-link.active {
+    background-color: #2563eb;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#productTabs .nav-link:hover:not(.active) {
+    background-color: #cbd5e1;
+}
+
+/* Table Styles */
+table th {
+    font-weight: 600;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Color Dots */
+.color-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 3px;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+/* Product Modal Enhancements */
+#productModal .modal-dialog {
+    max-width: 900px;
+}
+
+#productModal .modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+#productModal .modal-content {
+    overflow: visible;
+}
+
+#productModal .modal-header {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-bottom: none;
+}
+
+#productModal .modal-footer {
+    border-top: 1px solid #e5e7eb;
+}
+
+#productModal h6 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+#productModal .border-bottom {
+    border-color: #e5e7eb !important;
+}
+
+#productModal .form-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.4rem;
+    color: #374151;
+}
+
+#productModal .input-group-text {
+    background-color: #f3f4f6;
+    border-right: none;
+    color: #6b7280;
+}
+
+#productModal .input-group .form-control {
+    border-left: none;
+}
+
+#productModal .input-group .form-control:focus {
+    border-left: 1px solid #2563eb;
+}
+
+#productModal .form-check-input:checked {
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
+#productModal .form-switch .form-check-input {
+    width: 2.5rem;
+    height: 1.25rem;
+}
+
+/* Variant Area Styles */
+.variant-area {
+    max-height: 450px;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+}
+
+.variant-row {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+}
+
+.variant-row:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+
+.variant-row .form-control-sm {
+    font-size: 0.875rem;
+}
+
+.variant-row .btn-outline-danger:hover {
+    transform: scale(1.05);
+}
+
+/* Empty Variant State */
+.variant-area:empty::before {
+    content: "No variants added yet. Click 'Add Variant' to start.";
+    display: block;
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* Scrollbar Styling */
+.variant-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+.variant-area::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.variant-area::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.variant-area::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Vendor Autocomplete Dropdown */
+.vendor-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 250px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 2000; /* above modal content */
+    display: none;
+    margin-top: 2px;
+}
+
+.vendor-dropdown.show {
+    display: block;
+}
+
+.vendor-dropdown-item {
+    padding: 0.625rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.vendor-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.vendor-dropdown-item:hover {
+    background-color: #f3f4f6;
+}
+
+.vendor-dropdown-item.active {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.vendor-dropdown-item .vendor-name {
+    font-weight: 500;
+    color: #111827;
+    display: block;
+}
+
+.vendor-dropdown-item .vendor-id {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: block;
+    margin-top: 2px;
+}
+
+.vendor-dropdown-item:hover .vendor-name {
+    color: #2563eb;
+}
+
+.vendor-dropdown .no-results {
+    padding: 1rem;
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.vendor-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.vendor-dropdown::-webkit-scrollbar-track {
+    background: #f9fafb;
+}
+
+.vendor-dropdown::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+.vendor-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Vendor Picker extras */
+.vendor-picker { position: relative; }
+.vendor-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+}
+.vendor-clear:hover { color: #111827; }
+.selected-vendor-chip {
+    margin-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    border-radius: 9999px;
+    padding: 2px 10px;
+    font-size: 0.85rem;
+}
+.selected-vendor-chip .remove {
+    cursor: pointer;
+    color: #2563eb;
+}
+.selected-vendor-chip .remove:hover { color: #1e40af; }
+
+/* Color Palette Styles */
+.color-palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+    gap: 6px;
+    padding: 10px;
+    max-height: 300px;
+    background: #f8f9fa;
+}
+
+.color-palette-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.color-palette-grid::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 4px;
+}
+
+.color-palette-grid::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 4px;
+}
+
+.color-palette-grid::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
+}
+
+.color-palette-item {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.color-palette-item:hover {
+    transform: scale(1.15);
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    z-index: 20;
+}
+
+.color-palette-item:active {
+    transform: scale(1.05);
+}
+
+.color-palette-item:hover .color-palette-label {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.color-palette-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
+    color: white;
+    font-size: 0.65rem;
+    padding: 4px 2px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    font-weight: 500;
+}
+
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 0;
+}
+
+/* Ensure color dropdowns in modal show above everything */
+#productModal .dropdown-menu {
+    z-index: 2100;
+    position: absolute;
+}
+
+.dropdown-menu .border-bottom {
+    background: white;
+    border-radius: 8px 8px 0 0;
+}
+
+.color-swatch {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #dee2e6;
+    vertical-align: middle;
+}

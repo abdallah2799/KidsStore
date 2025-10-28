@@ -15,6 +15,9 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(p => p.CreatedAt)
                 .IsRequired();
 
+            builder.Property(p => p.TotalAmount)
+                .HasColumnType("decimal(18,2)");
+
             builder.HasMany(p => p.Items)
                 .WithOne(i => i.PurchaseInvoice)
                 .HasForeignKey(i => i.PurchaseInvoiceId)

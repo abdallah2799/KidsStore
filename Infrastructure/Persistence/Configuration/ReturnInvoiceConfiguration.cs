@@ -15,6 +15,9 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(r => r.CreatedAt)
                 .IsRequired();
 
+            builder.Property(r => r.TotalRefund)
+                .HasColumnType("decimal(18,2)");
+
             builder.HasMany(r => r.Items)
                 .WithOne(i => i.ReturnInvoice)
                 .HasForeignKey(i => i.ReturnInvoiceId)

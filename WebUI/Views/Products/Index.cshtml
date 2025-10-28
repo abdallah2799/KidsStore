@@ -1,29 +1,416 @@
 ﻿@{
+    ViewBag.Title = "Products";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var userName = User.Identity?.Name ?? "Guest";
-    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Unknown";
-    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Unknown";
 }
 
-<div class="d-flex flex-column align-items-center justify-content-center" style="height:80vh;">
-    <h1 style="font-weight:700; color:#2563eb;">@controllerName</h1>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <!-- Header: Title + Tabs Navigation -->
+        <h4 class="mb-3 fw-bold text-primary">
+            <i class="fas fa-box-open"></i> Products Management
+        </h4>
 
-    <p style="font-size:1.2rem; margin-top:10px;">
-        Logged in as:
-        <span style="font-weight:600; color:#16a34a;">@userName</span>
-        (<span style="color:#64748b;">@role</span>)
-    </p>
+        <ul class="nav nav-tabs mb-3" id="productTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="all-tab" data-bs-toggle="tab"
+                        data-bs-target="#allProducts" type="button" role="tab">
+                    All Products
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="season-tab" data-bs-toggle="tab"
+                        data-bs-target="#bySeason" type="button" role="tab">
+                    By Season
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="almost-tab" data-bs-toggle="tab"
+                        data-bs-target="#almostOut" type="button" role="tab">
+                    Almost Out (≤ 3)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="outofstock-tab" data-bs-toggle="tab"
+                        data-bs-target="#outOfStock" type="button" role="tab">
+                    Out of Stock
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="stagnant-tab" data-bs-toggle="tab"
+                        data-bs-target="#stagnantProducts" type="button" role="tab">
+                    Not Moved (30+ days)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="inactive-tab" data-bs-toggle="tab"
+                        data-bs-target="#inactiveProducts" type="button" role="tab">
+                    Inactive
+                </button>
+            </li>
+        </ul>
 
-    @if (User.IsInRole("Admin"))
-    {
-        <p style="color:#334155; margin-top:15px;">You have full administrative access to this module.</p>
-    }
-    else if (User.IsInRole("Cashier"))
-    {
-        <p style="color:#f59e0b; margin-top:15px;">Limited cashier access — certain actions may be restricted.</p>
-    }
-    else
-    {
-        <p style="color:#dc2626; margin-top:15px;">Unknown or unauthorized role.</p>
-    }
+        <!-- Tabs Content -->
+        <div class="tab-content" id="productTabsContent">
+
+            <!-- All Products Tab -->
+            <div class="tab-pane fade show active" id="allProducts" role="tabpanel">
+                <!-- Header Controls -->
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <input type="text" id="searchInput" class="form-control search-input"
+                           placeholder="🔍 Search products by name, code, or vendor..." />
+
+                    <button id="addProductBtn" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#productModal">
+                        <i class="fas fa-plus"></i> Add Product
+                    </button>
+                </div>
+
+                <!-- Table or Empty Placeholder -->
+                <div class="table-responsive" id="productsTableContainer">
+                    <div id="noProductsPlaceholder" class="text-center py-5 d-none">
+                        <h5 class="text-secondary mb-3"><i class="fas fa-box-open me-2"></i>No products yet!</h5>
+                        <button id="addProductBtnEmpty" class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#productModal">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </div>
+
+                    <table id="productsTable" class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Vendor</th>
+                                <th>Season</th>
+                                <th>Buying Price</th>
+                                <th>Selling Price</th>
+                                <th>Profit</th>
+                                <th>Total Stock</th>
+                                <th>Colors</th>
+                                <th>Sizes</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- By Season Tab -->
+            <div class="tab-pane fade" id="bySeason" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary season-filter-btn active" data-season="0">All Seasons</button>
+                        <button type="button" class="btn btn-outline-success season-filter-btn" data-season="1">Spring</button>
+                        <button type="button" class="btn btn-outline-warning season-filter-btn" data-season="2">Summer</button>
+                        <button type="button" class="btn btn-outline-danger season-filter-btn" data-season="3">Fall</button>
+                        <button type="button" class="btn btn-outline-info season-filter-btn" data-season="4">Winter</button>
+                        <button type="button" class="btn btn-outline-secondary season-filter-btn" data-season="5">All Year</button>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success" id="activateSeasonBtn" disabled>
+                            <i class="bi bi-check-circle"></i> Activate All
+                        </button>
+                        <button type="button" class="btn btn-danger" id="deactivateSeasonBtn" disabled>
+                            <i class="bi bi-x-circle"></i> Deactivate All
+                        </button>
+                    </div>
+                </div>
+                <div class="table-responsive mt-2">
+                    <table class="table table-hover align-middle" id="seasonTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Vendor</th>
+                                <th>Season</th>
+                                <th>Total Stock</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Will be populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        <!-- Almost Out Tab (<=3) -->
+        <div class="tab-pane fade" id="almostOut" role="tabpanel">
+            <div class="table-responsive mt-2">
+                <table class="table table-hover align-middle" id="almostOutTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Vendor</th>
+                            <th>Total Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Out of Stock Tab -->
+        <div class="tab-pane fade" id="outOfStock" role="tabpanel">
+            <div class="table-responsive mt-2">
+                <table class="table table-hover align-middle" id="outOfStockTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Vendor</th>
+                            <th>Total Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Not Moved (30+ days) Tab -->
+        <div class="tab-pane fade" id="stagnantProducts" role="tabpanel">
+            <div class="table-responsive mt-2">
+                <table class="table table-hover align-middle" id="stagnantTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Vendor</th>
+                            <th>Last Sold</th>
+                            <th>Total Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Almost Out (<=3) Tab -->
+        <div class="tab-pane fade" id="almostOut" role="tabpanel">
+            <div class="table-responsive mt-2">
+                <table class="table table-hover align-middle" id="almostOutTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Vendor</th>
+                            <th>Total Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Inactive Products Tab -->
+        <div class="tab-pane fade" id="inactiveProducts" role="tabpanel">
+            <div class="table-responsive mt-2">
+                <table class="table table-hover align-middle" id="inactiveTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Code</th>
+                            <th>Name</th>
+                            <th>Vendor</th>
+                            <th>Total Stock</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Will be populated via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    </div>
 </div>
+
+<!-- Add/Edit Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="productModalLabel">
+                    <i class="fas fa-box-open"></i> Add Product
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="productId" />
+
+                    <!-- Basic Information Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Basic Information
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Product Code <span class="text-danger">*</span></label>
+                                <input type="text" id="productCode" class="form-control" placeholder="e.g., P-001" required />
+                                <div class="form-text" id="codeHelp">Enter a unique code. We'll check availability automatically.</div>
+                                <div class="invalid-feedback" id="codeError">This code is already in use.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Season <span class="text-danger">*</span></label>
+                                <select id="seasonSelect" class="form-select" required>
+                                    <option value="5" selected>All Year</option>
+                                    <option value="1">Spring</option>
+                                    <option value="2">Summer</option>
+                                    <option value="3">Fall</option>
+                                    <option value="4">Winter</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Vendor <span class="text-danger">*</span></label>
+                                <div class="position-relative vendor-picker">
+                                    <input type="text" id="vendorSearch" class="form-control" 
+                                           placeholder="Type vendor name or ID..." 
+                                           autocomplete="off" required />
+                                    <input type="hidden" id="vendorSelect" required />
+                                    <button type="button" id="vendorClearBtn" class="btn btn-sm btn-link vendor-clear d-none" tabindex="-1" aria-label="Clear vendor">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <div id="vendorDropdown" class="vendor-dropdown"></div>
+                                    <div id="vendorChip" class="selected-vendor-chip d-none"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Product Name / Description</label>
+                                <input type="text" id="productDescription" class="form-control" placeholder="Enter product name or description" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="fas fa-dollar-sign me-2"></i>Pricing
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Buying Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-shopping-cart"></i></span>
+                                    <input type="number" id="buyingPrice" class="form-control" step="0.01" placeholder="0.00" />
+                                </div>
+                                <div class="invalid-feedback" id="buyingPriceError">Buying price must be a valid non-negative number.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Selling Price</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="number" id="sellingPrice" class="form-control" step="0.01" placeholder="0.00" />
+                                </div>
+                                <div class="invalid-feedback" id="sellingPriceError">Selling price must be greater than or equal to buying price.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Discount Limit (%)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+                                    <input type="number" id="discountLimit" class="form-control" step="0.01" placeholder="0" min="0" max="100" />
+                                </div>
+                                <div class="invalid-feedback" id="discountError">Discount exceeds the maximum allowed to keep selling ≥ buying.</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Profit (Amount)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-coins"></i></span>
+                                    <input type="number" id="profitAmount" class="form-control" step="0.01" placeholder="0.00" readonly />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Section -->
+                    <div class="mb-4">
+                        <h6 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="isActive" checked>
+                                    <label class="form-check-label fw-semibold" for="isActive">
+                                        <i class="fas fa-check-circle text-success me-1"></i> Active Product
+                                    </label>
+                                    <small class="d-block text-muted ms-4">Product will be available for sales</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="addInitialStock">
+                                    <label class="form-check-label fw-semibold" for="addInitialStock">
+                                        <i class="fas fa-box me-1"></i> Add Initial Stock
+                                    </label>
+                                    <small class="d-block text-muted ms-4">Add variants with color, size & quantity</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Variant Section (Hidden until checkbox is checked) -->
+                    <div id="variantSection" class="d-none">
+                        <h6 class="text-primary border-bottom pb-2 mb-3">
+                            <i class="fas fa-palette me-2"></i>Product Variants
+                        </h6>
+                        <div class="variant-area mb-3" id="variantArea">
+                            <div id="variantList">
+                                <!-- Variant rows will be added here -->
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="button" id="btnAddVariantRow" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-plus"></i> Add Variant
+                            </button>
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> Specify color, size (1-18), and initial stock quantity
+                            </small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <div class="me-auto text-muted small">
+                    <i class="fas fa-lightbulb text-warning"></i> 
+                    <strong>Tip:</strong> Products can be created without variants. Add them later via purchase invoices.
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <button type="button" id="saveProductBtn" class="btn btn-success">
+                    <i class="fas fa-save me-1"></i> Save Product
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/products.css" />
+}
+
+@section Scripts {
+    <script src="~/js/products.js"></script>
+}
