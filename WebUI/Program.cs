@@ -61,6 +61,8 @@ builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 builder.Services.AddScoped<Application.Interfaces.Services.IReportService, Application.Services.ReportService>();
+builder.Services.AddScoped<Application.Interfaces.Services.IUserService, Application.Services.UserService>();
+builder.Services.AddScoped<Application.Interfaces.Services.IBackupService, Application.Services.BackupService>();
 
 // ==========================================
 // 3. Session & Authentication Configuration
