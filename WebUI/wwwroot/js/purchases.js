@@ -1204,10 +1204,13 @@ function renderInvoicesTable() {
             <td class="fw-bold text-success">${inv.totalAmount.toFixed(2)} EGP</td>
             <td>${inv.items.length}</td>
             <td class="text-center">
-                <button class="btn btn-sm btn-info btn-action" onclick="viewInvoice(${inv.id})">
+                <button class="btn btn-sm btn-outline-primary btn-action" onclick="printPurchaseInvoice(${inv.id})" title="Print Invoice">
+                    <i class="fas fa-print"></i>
+                </button>
+                <button class="btn btn-sm btn-info btn-action" onclick="viewInvoice(${inv.id})" title="View Details">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn btn-sm btn-danger btn-action" onclick="deleteInvoice(${inv.id})">
+                <button class="btn btn-sm btn-danger btn-action" onclick="deleteInvoice(${inv.id})" title="Delete">
                     <i class="fas fa-trash"></i>
                 </button>
             </td>
@@ -1261,6 +1264,10 @@ function viewInvoice(id) {
     document.getElementById('invoiceDetailsContent').innerHTML = content;
     const modal = new bootstrap.Modal(document.getElementById('invoiceDetailsModal'));
     modal.show();
+}
+
+function printPurchaseInvoice(id) {
+    window.open(`/Purchases/ViewPurchaseInvoice?id=${id}`, '_blank');
 }
 
 function deleteInvoice(id) {

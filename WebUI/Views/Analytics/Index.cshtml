@@ -1,0 +1,491 @@
+@{
+    ViewData["Title"] = "Analytics Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-chart-bar me-2"></i>Analytics Dashboard</h2>
+        <div>
+            <button class="btn btn-outline-primary" onclick="refreshAllCharts()">
+                <i class="fas fa-sync-alt me-1"></i>Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm border-0 bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Today's Sales</h6>
+                            <h3 class="mb-0" id="todaySales">0.00</h3>
+                        </div>
+                        <i class="fas fa-dollar-sign fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm border-0 bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Month's Sales</h6>
+                            <h3 class="mb-0" id="monthSales">0.00</h3>
+                        </div>
+                        <i class="fas fa-chart-line fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm border-0 bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Today's Returns</h6>
+                            <h3 class="mb-0" id="todayReturns">0.00</h3>
+                        </div>
+                        <i class="fas fa-undo-alt fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card shadow-sm border-0 bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Low Stock Items</h6>
+                            <h3 class="mb-0" id="lowStockItems">0</h3>
+                        </div>
+                        <i class="fas fa-exclamation-triangle fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Sales Over Time</h5>
+                    <select class="form-select form-select-sm w-auto" id="salesTimeRange" onchange="loadSalesOverTime()">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesOverTimeChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-credit-card me-2"></i>Payment Methods</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentMethodsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-boxes me-2"></i>Top Products</h5>
+                    <select class="form-select form-select-sm w-auto" id="topProductsCount" onchange="loadTopProducts()">
+                        <option value="5">Top 5</option>
+                        <option value="10" selected>Top 10</option>
+                        <option value="20">Top 20</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <canvas id="topProductsChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-undo-alt me-2"></i>Returns Over Time</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="returnsOverTimeChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 3 -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Cashier Performance</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="cashierPerformanceChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-warehouse me-2"></i>Stock Levels (Lowest)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="stockLevelsChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exportable Reports -->
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-file-export me-2"></i>Exportable Reports</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6>Sales Report</h6>
+                            <div class="input-group mb-2">
+                                <input type="date" class="form-control" id="salesReportStart">
+                                <input type="date" class="form-control" id="salesReportEnd">
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm" onclick="exportReport('sales')">
+                                <i class="fas fa-download me-1"></i>Export Sales Report
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6>Returns Report</h6>
+                            <div class="input-group mb-2">
+                                <input type="date" class="form-control" id="returnsReportStart">
+                                <input type="date" class="form-control" id="returnsReportEnd">
+                            </div>
+                            <button class="btn btn-outline-warning btn-sm" onclick="exportReport('returns')">
+                                <i class="fas fa-download me-1"></i>Export Returns Report
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6>Inventory Report</h6>
+                            <button class="btn btn-outline-success btn-sm" onclick="exportReport('inventory')">
+                                <i class="fas fa-download me-1"></i>Export Inventory Report
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6>Cashier Performance Report</h6>
+                            <div class="input-group mb-2">
+                                <input type="date" class="form-control" id="cashierReportStart">
+                                <input type="date" class="form-control" id="cashierReportEnd">
+                            </div>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="exportReport('cashier')">
+                                <i class="fas fa-download me-1"></i>Export Cashier Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let charts = {};
+
+        // Initialize all charts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardSummary();
+            loadSalesOverTime();
+            loadTopProducts();
+            loadReturnsOverTime();
+            loadCashierPerformance();
+            loadPaymentMethods();
+            loadStockLevels();
+            
+            // Set default dates for reports
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            
+            document.getElementById('salesReportEnd').value = today.toISOString().split('T')[0];
+            document.getElementById('salesReportStart').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('returnsReportEnd').value = today.toISOString().split('T')[0];
+            document.getElementById('returnsReportStart').value = lastMonth.toISOString().split('T')[0];
+            document.getElementById('cashierReportEnd').value = today.toISOString().split('T')[0];
+            document.getElementById('cashierReportStart').value = lastMonth.toISOString().split('T')[0];
+        });
+
+        function loadDashboardSummary() {
+            fetch('/Analytics/DashboardSummary')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('todaySales').textContent = data.todaySales.toFixed(2) + ' EGP';
+                    document.getElementById('monthSales').textContent = data.monthSales.toFixed(2) + ' EGP';
+                    document.getElementById('todayReturns').textContent = data.todayReturns.toFixed(2) + ' EGP';
+                    document.getElementById('lowStockItems').textContent = data.lowStockItems;
+                })
+                .catch(err => console.error('Error loading summary:', err));
+        }
+
+        function loadSalesOverTime() {
+            const days = document.getElementById('salesTimeRange').value;
+            fetch(`/Analytics/SalesOverTimeData?days=${days}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (charts.salesOverTime) charts.salesOverTime.destroy();
+                    
+                    const ctx = document.getElementById('salesOverTimeChart').getContext('2d');
+                    charts.salesOverTime = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map(d => d.date),
+                            datasets: [{
+                                label: 'Sales Amount (EGP)',
+                                data: data.map(d => d.total),
+                                borderColor: 'rgb(75, 192, 192)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                tension: 0.1,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading sales over time:', err));
+        }
+
+        function loadTopProducts() {
+            const top = document.getElementById('topProductsCount').value;
+            fetch(`/Analytics/TopProductsData?top=${top}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (charts.topProducts) charts.topProducts.destroy();
+                    
+                    const ctx = document.getElementById('topProductsChart').getContext('2d');
+                    charts.topProducts = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(d => d.product),
+                            datasets: [{
+                                label: 'Quantity Sold',
+                                data: data.map(d => d.quantity),
+                                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading top products:', err));
+        }
+
+        function loadReturnsOverTime() {
+            fetch('/Analytics/ReturnsOverTimeData?days=30')
+                .then(res => res.json())
+                .then(data => {
+                    if (charts.returnsOverTime) charts.returnsOverTime.destroy();
+                    
+                    const ctx = document.getElementById('returnsOverTimeChart').getContext('2d');
+                    charts.returnsOverTime = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.map(d => d.date),
+                            datasets: [{
+                                label: 'Return Amount (EGP)',
+                                data: data.map(d => d.total),
+                                borderColor: 'rgb(255, 159, 64)',
+                                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                                tension: 0.1,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading returns over time:', err));
+        }
+
+        function loadCashierPerformance() {
+            fetch('/Analytics/CashierPerformanceData')
+                .then(res => res.json())
+                .then(data => {
+                    if (charts.cashierPerformance) charts.cashierPerformance.destroy();
+                    
+                    const ctx = document.getElementById('cashierPerformanceChart').getContext('2d');
+                    charts.cashierPerformance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(d => d.cashier),
+                            datasets: [{
+                                label: 'Total Sales (EGP)',
+                                data: data.map(d => d.totalSales),
+                                backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading cashier performance:', err));
+        }
+
+        function loadPaymentMethods() {
+            fetch('/Analytics/PaymentMethodsData')
+                .then(res => res.json())
+                .then(data => {
+                    if (charts.paymentMethods) charts.paymentMethods.destroy();
+                    
+                    const ctx = document.getElementById('paymentMethodsChart').getContext('2d');
+                    charts.paymentMethods = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: data.map(d => d.method),
+                            datasets: [{
+                                data: data.map(d => d.total),
+                                backgroundColor: [
+                                    'rgba(255, 99, 132, 0.8)',
+                                    'rgba(54, 162, 235, 0.8)',
+                                    'rgba(255, 206, 86, 0.8)',
+                                    'rgba(75, 192, 192, 0.8)',
+                                    'rgba(153, 102, 255, 0.8)'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading payment methods:', err));
+        }
+
+        function loadStockLevels() {
+            fetch('/Analytics/StockLevelsData')
+                .then(res => res.json())
+                .then(data => {
+                    if (charts.stockLevels) charts.stockLevels.destroy();
+                    
+                    const ctx = document.getElementById('stockLevelsChart').getContext('2d');
+                    charts.stockLevels = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(d => d.product),
+                            datasets: [{
+                                label: 'Stock Quantity',
+                                data: data.map(d => d.stock),
+                                backgroundColor: data.map(d => d.stock < 10 ? 'rgba(255, 99, 132, 0.8)' : 'rgba(75, 192, 192, 0.8)'),
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading stock levels:', err));
+        }
+
+        function refreshAllCharts() {
+            loadDashboardSummary();
+            loadSalesOverTime();
+            loadTopProducts();
+            loadReturnsOverTime();
+            loadCashierPerformance();
+            loadPaymentMethods();
+            loadStockLevels();
+        }
+
+        function exportReport(type) {
+            let url = '';
+            let params = new URLSearchParams();
+            
+            switch(type) {
+                case 'sales':
+                    const salesStart = document.getElementById('salesReportStart').value;
+                    const salesEnd = document.getElementById('salesReportEnd').value;
+                    url = '/Analytics/ExportSalesReport';
+                    if (salesStart) params.append('startDate', salesStart);
+                    if (salesEnd) params.append('endDate', salesEnd);
+                    break;
+                case 'returns':
+                    const returnsStart = document.getElementById('returnsReportStart').value;
+                    const returnsEnd = document.getElementById('returnsReportEnd').value;
+                    url = '/Analytics/ExportReturnsReport';
+                    if (returnsStart) params.append('startDate', returnsStart);
+                    if (returnsEnd) params.append('endDate', returnsEnd);
+                    break;
+                case 'inventory':
+                    url = '/Analytics/ExportInventoryReport';
+                    break;
+                case 'cashier':
+                    const cashierStart = document.getElementById('cashierReportStart').value;
+                    const cashierEnd = document.getElementById('cashierReportEnd').value;
+                    url = '/Analytics/ExportCashierReport';
+                    if (cashierStart) params.append('startDate', cashierStart);
+                    if (cashierEnd) params.append('endDate', cashierEnd);
+                    break;
+            }
+            
+            // Open report in new window
+            const fullUrl = params.toString() ? `${url}?${params.toString()}` : url;
+            window.open(fullUrl, '_blank');
+        }
+    </script>
+}

@@ -95,22 +95,6 @@
                 @if (currentRole == "Admin")
                 {
                     <div class="nav-section">
-                        <div class="nav-section-title">Reports</div>
-                        <div class="nav-item">
-                            <a href="@Url.Action("Sales", "Reports")" class="nav-link">
-                                <i class="fas fa-chart-line"></i>
-                                <span>Sales Reports</span>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="@Url.Action("Inventory", "Reports")" class="nav-link">
-                                <i class="fas fa-boxes"></i>
-                                <span>Inventory Reports</span>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="nav-section">
                         <div class="nav-section-title">System</div>
                         <div class="nav-item">
                             <a href="@Url.Action("Index", "Users")" class="nav-link">
@@ -185,6 +169,7 @@
         @RenderBody()
     </main>
 
+    <script src="@Url.Content("~/lib/jquery/dist/jquery.min.js")"></script>
     <script src="@Url.Content("~/lib/bootstrap/dist/js/bootstrap.js")"></script>
     <script src="@Url.Content("~/js/toastHelper.js")"></script>
     <script src="@Url.Content("~/js/modalHelper.js")"></script>

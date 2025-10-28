@@ -1,217 +1,946 @@
-﻿@using System.Security.Claims
-@{
-    ViewBag.Title = "Dashboard";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-
-    var user = User;
-    var currentUser = user?.Identity?.Name ?? "Guest";
-    var currentRole = user?.FindFirst(ClaimTypes.Role)?.Value ?? "Guest";
-    var isAdmin = currentRole == "Admin";
-    var isCashier = currentRole == "Cashier";
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    var userRole = ViewBag.UserRole as string;
+    var isAdmin = userRole == "Admin";
 }
 
-<link href="~/css/IndexStyle.css" rel="stylesheet" />
-
-@if (isCashier)
-{
-    <!-- CASHIER DASHBOARD -->
-    <div class="welcome-banner">
-        <h1 class="welcome-title">Welcome, @currentUser!</h1>
-        <p class="welcome-subtitle">Ready to start your shift? Let's make it a great day!</p>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon blue">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-            </div>
-            <div class="stat-title">Your Sales Today</div>
-            <div class="stat-value">$847</div>
-            <div class="stat-subtitle">8 transactions completed</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon orange">
-                    <i class="fas fa-undo"></i>
-                </div>
-            </div>
-            <div class="stat-title">Returns Today</div>
-            <div class="stat-value">2</div>
-            <div class="stat-subtitle">Total value: $156</div>
-        </div>
-    </div>
-
-    <div class="cashier-actions">
-        <a href="@Url.Action("Index", "Sales")" class="action-card primary">
-            <div class="action-icon">
-                <i class="fas fa-cash-register"></i>
-            </div>
-            <div class="action-title">New Sale</div>
-            <div class="action-description">Start a new transaction</div>
-        </a>
-
-        <a href="@Url.Action("Index", "Returns")" class="action-card success">
-            <div class="action-icon">
-                <i class="fas fa-undo"></i>
-            </div>
-            <div class="action-title">Process Return</div>
-            <div class="action-description">Handle product returns</div>
-        </a>
-    </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">
-                <i class="fas fa-history" style="color: #2563eb;"></i>
-                Your Recent Sales
-            </h2>
-        </div>
-
-        <div class="table-responsive">
-            <table class="custom-table">
-                <thead>
-                    <tr>
-                        <th>Invoice #</th>
-                        <th>Time</th>
-                        <th>Items</th>
-                        <th>Payment</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>#INV-0842</strong></td>
-                        <td>10:24 AM</td>
-                        <td>3 items</td>
-                        <td><span class="badge badge-success">Cash</span></td>
-                        <td><strong>$125.00</strong></td>
-                    </tr>
-                    <tr>
-                        <td><strong>#INV-0841</strong></td>
-                        <td>10:15 AM</td>
-                        <td>2 items</td>
-                        <td><span class="badge badge-success">Card</span></td>
-                        <td><strong>$89.50</strong></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+@section Styles {
+    <style>
+        .summary-card {
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+        .summary-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0;
+        }
+        .summary-card p {
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+        .bg-primary-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .bg-success-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .bg-info-gradient {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .bg-warning-gradient {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        .section-header {
+            border-left: 4px solid #667eea;
+            padding-left: 15px;
+            margin-bottom: 20px;
+            margin-top: 30px;
+        }
+        .section-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        .section-header p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .badge-rank {
+            font-size: 1rem;
+            padding: 0.5rem;
+        }
+        .quick-action-btn {
+            height: 120px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+        }
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+        .low-stock-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        .export-btn {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        @@media print {
+            .no-print, .btn, button, .card-header, .section-header {
+                display: none !important;
+            }
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
 }
-else if (isAdmin)
-{
-    <!-- ADMIN DASHBOARD -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon blue">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="stat-trend up">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>12.5%</span>
-                </div>
-            </div>
-            <div class="stat-title">Today's Sales</div>
-            <div class="stat-value">$2,547</div>
-            <div class="stat-subtitle">15 transactions today</div>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon green">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <div class="stat-trend up">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>8.3%</span>
-                </div>
-            </div>
-            <div class="stat-title">Total Profit (Month)</div>
-            <div class="stat-value">$12,458</div>
-            <div class="stat-subtitle">From 342 sales</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon orange">
-                    <i class="fas fa-tshirt"></i>
-                </div>
-                <div class="stat-trend down">
-                    <i class="fas fa-arrow-down"></i>
-                    <span>3.2%</span>
-                </div>
-            </div>
-            <div class="stat-title">Total Products</div>
-            <div class="stat-value">1,284</div>
-            <div class="stat-subtitle">42 low stock items</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon red">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-            </div>
-            <div class="stat-title">Low Stock Items</div>
-            <div class="stat-value">42</div>
-            <div class="stat-subtitle">Action required</div>
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>@(isAdmin ? "Admin Dashboard" : "Cashier Dashboard")</h2>
+            <p class="text-muted">Welcome back! Here's what's happening today.</p>
         </div>
     </div>
 
-    <div class="content-grid">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title">
-                    <i class="fas fa-fire" style="color: #f59e0b;"></i>
-                    Top Selling Products
-                </h2>
-                <a href="@Url.Action("Sales", "Reports")" class="card-action">
-                    View All <i class="fas fa-arrow-right"></i>
-                </a>
+    <!-- Summary Cards -->
+    <div class="row mb-4" id="summaryCards">
+        <div class="col-md-3">
+            <div class="summary-card bg-primary-gradient">
+                <p>Today's Sales</p>
+                <h3 id="todaySales">$0.00</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card bg-success-gradient">
+                <p>This Month's Sales</p>
+                <h3 id="monthSales">$0.00</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="summary-card bg-info-gradient">
+                <p>Today's Returns</p>
+                <h3 id="todayReturns">$0.00</h3>
+            </div>
+        </div>
+        @if (isAdmin)
+        {
+            <div class="col-md-3">
+                <div class="summary-card bg-warning-gradient">
+                    <p>Low Stock Items</p>
+                    <h3 id="lowStockCount">0</h3>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-md-3">
+                <div class="summary-card bg-warning-gradient">
+                    <p>My Invoices Today</p>
+                    <h3 id="myInvoicesCount">0</h3>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!isAdmin)
+    {
+        <!-- Quick Actions (Cashier Only) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <a href="@Url.Action("NewSale", "Sales")" class="btn btn-primary w-100 quick-action-btn">
+                                    <i class="fas fa-plus-circle fa-2x d-block mb-2"></i>
+                                    New Sale
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="@Url.Action("Index", "Returns")" class="btn btn-warning w-100 quick-action-btn">
+                                    <i class="fas fa-undo fa-2x d-block mb-2"></i>
+                                    Process Return
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ============================================ -->
+    <!-- SECTION 1: TABLES -->
+    <!-- ============================================ -->
+    <div class="section-header">
+        <h3><i class="fas fa-table"></i> Data Tables</h3>
+        <p>Real-time business data and inventory information</p>
+    </div>
+
+    <div class="row">
+        <!-- Recent Sales Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-0receipt"></i> Recent Sales</h5>
+                    <a href="@Url.Action("Invoices", "Sales")" class="btn btn-sm btn-outline-secondary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm" id="recentSalesTable">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Purchases Table -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart"></i> Recent Purchases</h5>
+                    <a href="@Url.Action("Index", "Purchases")" class="btn btn-sm btn-outline-secondary">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm" id="recentPurchasesTable">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Vendor</th>
+                                    <th>Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Top Products & Low Stock -->
+        <div class="col-lg-12 mb-4">
+            <div class="row">
+                <!-- Top Products -->
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-star"></i> Top 5 Products</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-sm" id="topProductsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Product</th>
+                                            <th>Qty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" class="text-center">
+                                        <div class="spinner-border spinner-border-sm" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (isAdmin)
+        {
+            <!-- Low Stock Alert -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Low Stock Alert</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm" id="lowStockTable">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Color</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" class="text-center">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <a href="@Url.Action("Index", "Products")" class="btn btn-sm btn-outline-primary w-100 mt-2">
+                            Manage Inventory
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SECTION 2: CHARTS -->
+    <!-- ============================================ -->
+    <div class="section-header">
+        <h3><i class="fas fa-chart-line"></i> Analytics Charts</h3>
+        <p>Visual insights and trends for better decision making</p>
+    </div>
+
+    <div class="row">
+        <!-- Sales Over Time -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-area"></i> Sales Trend</h5>
+                    <select class="form-select form-select-sm" style="width: auto;" id="salesPeriodFilter" onchange="loadSalesChart()">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Returns Over Time -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-undo-alt"></i> Returns Trend</h5>
+                    <select class="form-select form-select-sm" style="width: auto;" id="returnsPeriodFilter" onchange="loadReturnsChart()">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="returnsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isAdmin)
+    {
+        <div class="row">
+            <!-- Payment Methods Distribution -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-credit-card"></i> Payment Methods</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="paymentMethodsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Category</th>
-                            <th>Sold</th>
-                            <th>Stock</th>
-                            <th>Revenue</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Blue Denim Jacket</td>
-                            <td>Kids</td>
-                            <td><strong>142</strong></td>
-                            <td><span class="badge badge-success">In Stock</span></td>
-                            <td><strong>$3,550</strong></td>
-                        </tr>
-                        <tr>
-                            <td>Cotton T-Shirt Set</td>
-                            <td>Kids</td>
-                            <td><strong>128</strong></td>
-                            <td><span class="badge badge-warning">Low Stock</span></td>
-                            <td><strong>$2,560</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <!-- Cashier Performance -->
+            <div class="col-lg-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-user-tie"></i> Cashier Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="cashierPerformanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-}
-else
-{
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">Welcome to Store Manager</h2>
+    }
+
+    <!-- ============================================ -->
+    <!-- SECTION 3: REPORTS EXPORT -->
+    <!-- ============================================ -->
+    @if (isAdmin)
+    {
+        <div class="section-header">
+            <h3><i class="fas fa-file-export"></i> Export Reports</h3>
+            <p>Generate and download detailed business reports</p>
         </div>
-        <p>Please contact your administrator to verify your account role.</p>
-    </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-download"></i> Generate Reports</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">From Date</label>
+                                <input type="date" class="form-control" id="reportStartDate" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">To Date</label>
+                                <input type="date" class="form-control" id="reportEndDate" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn btn-outline-secondary w-100" onclick="setDateRangePreset('today')">
+                                    Today
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100" onclick="setDateRangePreset('week')">
+                                    This Week
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100" onclick="setDateRangePreset('month')">
+                                    This Month
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-secondary w-100" onclick="setDateRangePreset('year')">
+                                    This Year
+                                </button>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <h6 class="mb-3">Available Reports:</h6>
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100 export-btn" onclick="exportReport('sales')">
+                                    <i class="fas fa-file-invoice-dollar"></i> Sales Report
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-success w-100 export-btn" onclick="exportReport('inventory')">
+                                    <i class="fas fa-boxes"></i> Inventory Report
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-warning w-100 export-btn" onclick="exportReport('returns')">
+                                    <i class="fas fa-undo"></i> Returns Report
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-info w-100 export-btn" onclick="exportReport('cashier')">
+                                    <i class="fas fa-users"></i> Cashier Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/lib/chart.js/chart.umd.min.js")"></script>
+    <script>
+        let salesChart = null;
+        let returnsChart = null;
+        let paymentMethodsChart = null;
+        let cashierPerformanceChart = null;
+        const isAdmin = @(isAdmin ? "true" : "false");
+
+        $(document).ready(function() {
+            // Set default dates for reports
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            $('#reportStartDate').val(firstDay.toISOString().split('T')[0]);
+            $('#reportEndDate').val(today.toISOString().split('T')[0]);
+
+            // Load all dashboard components
+            loadDashboard();
+        });
+
+        function loadDashboard() {
+            loadSummary();
+            loadTopProducts();
+            loadRecentSales();
+            loadRecentPurchases();
+            loadSalesChart();
+            loadReturnsChart();
+            
+            if (isAdmin) {
+                loadLowStock();
+                loadPaymentMethodsChart();
+                loadCashierPerformanceChart();
+            }
+        }
+
+        function loadSummary() {
+            $.get('@Url.Action("GetDashboardSummary", "Home")', function(data) {
+                $('#todaySales').text('$' + data.todaySales.toFixed(2));
+                $('#monthSales').text('$' + data.monthSales.toFixed(2));
+                $('#todayReturns').text('$' + data.todayReturns.toFixed(2));
+                
+                if (isAdmin) {
+                    $('#lowStockCount').text(data.lowStockCount);
+                } else {
+                    $('#myInvoicesCount').text(data.myInvoicesCount || 0);
+                }
+            }).fail(function() {
+                console.error('Failed to load summary data');
+            });
+        }
+
+        function loadSalesChart() {
+            const days = $('#salesPeriodFilter').val() || 30;
+            
+            $.get('@Url.Action("GetSalesChart", "Home")', { days: days }, function(data) {
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                
+                if (salesChart) {
+                    salesChart.destroy();
+                }
+
+                salesChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => new Date(d.date).toLocaleDateString()),
+                        datasets: [{
+                            label: 'Sales Amount',
+                            data: data.map(d => d.total),
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#667eea',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Sales: $' + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }).fail(function() {
+                console.error('Failed to load sales chart');
+            });
+        }
+
+        function loadReturnsChart() {
+            const days = $('#returnsPeriodFilter').val() || 30;
+            const url = '@Url.Action("ReturnsOverTimeData", "Analytics")';
+            
+            $.get(url, { days: days }, function(data) {
+                const ctx = document.getElementById('returnsChart').getContext('2d');
+                
+                if (returnsChart) {
+                    returnsChart.destroy();
+                }
+
+                returnsChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.map(d => new Date(d.date).toLocaleDateString()),
+                        datasets: [{
+                            label: 'Returns Amount',
+                            data: data.map(d => d.total),
+                            borderColor: '#f5576c',
+                            backgroundColor: 'rgba(245, 87, 108, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#f5576c',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Returns: $' + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }).fail(function() {
+                console.error('Failed to load returns chart');
+            });
+        }
+
+        function loadPaymentMethodsChart() {
+            const url = '@Url.Action("PaymentMethodsData", "Analytics")';
+            
+            $.get(url, function(data) {
+                const ctx = document.getElementById('paymentMethodsChart').getContext('2d');
+                
+                if (paymentMethodsChart) {
+                    paymentMethodsChart.destroy();
+                }
+
+                paymentMethodsChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.map(d => d.method),
+                        datasets: [{
+                            data: data.map(d => d.total),
+                            backgroundColor: [
+                                '#667eea',
+                                '#f093fb',
+                                '#4facfe',
+                                '#fa709a',
+                                '#43e97b'
+                            ],
+                            borderWidth: 2,
+                            borderColor: '#fff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = '$' + context.parsed.toFixed(2);
+                                        return label + ': ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }).fail(function() {
+                console.error('Failed to load payment methods chart');
+            });
+        }
+
+        function loadCashierPerformanceChart() {
+            const url = '@Url.Action("CashierPerformanceData", "Analytics")';
+            
+            $.get(url, function(data) {
+                const ctx = document.getElementById('cashierPerformanceChart').getContext('2d');
+                
+                if (cashierPerformanceChart) {
+                    cashierPerformanceChart.destroy();
+                }
+
+                cashierPerformanceChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.map(d => d.cashier),
+                        datasets: [{
+                            label: 'Total Sales',
+                            data: data.map(d => d.totalSales),
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                            borderColor: '#667eea',
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Sales: $' + context.parsed.y.toFixed(2);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }).fail(function() {
+                console.error('Failed to load cashier performance chart');
+            });
+        }
+
+        function loadTopProducts() {
+            $.get('@Url.Action("GetTopProducts", "Home")', { count: 5 }, function(data) {
+                const tbody = $('#topProductsTable tbody');
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="3" class="text-center">No data available</td></tr>');
+                    return;
+                }
+
+                const badges = ['primary', 'success', 'info', 'warning', 'secondary'];
+                data.forEach((item, index) => {
+                    tbody.append(`
+                        <tr>
+                            <td><span class="badge bg-${badges[index]} badge-rank">${index + 1}</span></td>
+                            <td><small>${item.product}</small></td>
+                            <td><strong>${item.quantity}</strong></td>
+                        </tr>
+                    `);
+                });
+            }).fail(function() {
+                $('#topProductsTable tbody').html('<tr><td colspan="3" class="text-center text-danger">Failed to load</td></tr>');
+            });
+        }
+
+        function loadRecentSales() {
+            $.get('@Url.Action("GetRecentSales", "Home")', { count: 10 }, function(data) {
+                const tbody = $('#recentSalesTable tbody');
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="5" class="text-center">No sales found</td></tr>');
+                    return;
+                }
+
+                data.forEach(sale => {
+                    const date = new Date(sale.saleDate);
+                    tbody.append(`
+                        <tr>
+                            <td><strong>#${sale.id}</strong></td>
+                            <td><small>${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small></td>
+                            <td><small>${sale.customerName || 'Walk-in'}</small></td>
+                            <td><strong>$${sale.totalAmount.toFixed(2)}</strong></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary no-print" onclick="printInvoice(${sale.id})">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }).fail(function() {
+                $('#recentSalesTable tbody').html('<tr><td colspan="5" class="text-center text-danger">Failed to load</td></tr>');
+            });
+        }
+
+        function loadRecentPurchases() {
+            $.get('@Url.Action("GetRecentPurchases", "Home")', { count: 10 }, function(data) {
+                const tbody = $('#recentPurchasesTable tbody');
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="5" class="text-center">No purchases found</td></tr>');
+                    return;
+                }
+
+                data.forEach(purchase => {
+                    const date = new Date(purchase.purchaseDate);
+                    tbody.append(`
+                        <tr>
+                            <td><strong>#${purchase.id}</strong></td>
+                            <td><small>${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small></td>
+                            <td><small>${purchase.vendorName}</small></td>
+                            <td><strong>$${purchase.totalAmount.toFixed(2)}</strong></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info no-print" onclick="printPurchaseInvoice(${purchase.id})">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }).fail(function() {
+                $('#recentPurchasesTable tbody').html('<tr><td colspan="5" class="text-center text-danger">Failed to load</td></tr>');
+            });
+        }
+
+        function loadLowStock() {
+            $.get('@Url.Action("GetLowStockProducts", "Home")', function(data) {
+                const tbody = $('#lowStockTable tbody');
+                tbody.empty();
+
+                if (data.length === 0) {
+                    tbody.append('<tr><td colspan="3" class="text-center text-success">All products in stock!</td></tr>');
+                    return;
+                }
+
+                data.forEach(item => {
+                    const colorStyle = item.color ? `background-color: ${item.color}` : 'background-color: #ddd';
+                    tbody.append(`
+                        <tr>
+                            <td><small>${item.productName}</small></td>
+                            <td><span class="low-stock-color" style="${colorStyle}"></span></td>
+                            <td><span class="badge bg-danger">${item.stock}</span></td>
+                        </tr>
+                    `);
+                });
+            }).fail(function() {
+                $('#lowStockTable tbody').html('<tr><td colspan="3" class="text-center text-danger">Failed to load</td></tr>');
+            });
+        }
+
+        function printInvoice(id) {
+            window.open('@Url.Action("ViewReceipt", "Sales")?id=' + id, '_blank');
+        }
+
+        function printPurchaseInvoice(id) {
+            window.open('@Url.Action("ViewPurchaseInvoice", "Purchases")?id=' + id, '_blank');
+        }
+
+        // Date Range Presets
+        function setDateRangePreset(preset) {
+            const today = new Date();
+            let startDate, endDate;
+
+            switch(preset) {
+                case 'today':
+                    startDate = endDate = today;
+                    break;
+                case 'week':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+                    endDate = today;
+                    break;
+                case 'month':
+                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+                    endDate = today;
+                    break;
+                case 'year':
+                    startDate = new Date(today.getFullYear(), 0, 1);
+                    endDate = today;
+                    break;
+            }
+
+            $('#reportStartDate').val(startDate.toISOString().split('T')[0]);
+            $('#reportEndDate').val(endDate.toISOString().split('T')[0]);
+        }
+
+        // Export Reports - Opens formatted HTML views with print functionality
+        function exportReport(type) {
+            const startDate = $('#reportStartDate').val();
+            const endDate = $('#reportEndDate').val();
+
+            if (!startDate || !endDate) {
+                alert('Please select start and end dates');
+                return;
+            }
+
+            let url = '';
+            switch(type) {
+                case 'sales':
+                    url = '@Url.Action("ViewSalesReport", "Home")';
+                    break;
+                case 'inventory':
+                    url = '@Url.Action("ViewInventoryReport", "Home")';
+                    break;
+                case 'returns':
+                    url = '@Url.Action("ViewReturnsReport", "Home")';
+                    break;
+                case 'cashier':
+                    url = '@Url.Action("ViewCashierReport", "Home")';
+                    break;
+            }
+
+            // Add date parameters for reports that need them
+            if (type !== 'inventory') {
+                url += `?startDate=${startDate}&endDate=${endDate}`;
+            }
+
+            // Open report in new window for printing
+            window.open(url, '_blank');
+        }
+    </script>
 }
