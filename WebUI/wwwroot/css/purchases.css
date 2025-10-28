@@ -1,0 +1,520 @@
+/* ==================== PURCHASES PAGE STYLES ==================== */
+
+/* Product Block Styling */
+.product-block {
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.product-block:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.product-block .card-header {
+    padding: 1rem;
+}
+
+.product-block .card-header .form-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.product-block .card-header .form-control-sm {
+    font-size: 0.85rem;
+}
+
+.product-block .profit-display {
+    background: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.product-block .variants-table {
+    margin-bottom: 0;
+}
+
+.product-block .variants-table thead th {
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #f8fafc;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.product-block .variants-table tbody td {
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+
+.product-block .product-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1050;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-top: 2px;
+}
+
+.product-block .product-dropdown.show {
+    display: block;
+}
+
+.product-total {
+    font-size: 1.1rem;
+}
+
+/* Invoice Table Styling */
+#invoiceItemsTable thead th {
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #1e293b;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#invoiceItemsTable tbody td {
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+
+#invoiceItemsTable .form-control-sm {
+    font-size: 0.85rem;
+    padding: 0.375rem 0.5rem;
+    text-align: center;
+}
+
+#invoiceItemsTable .buying-price-input,
+#invoiceItemsTable .selling-price-input,
+#invoiceItemsTable .discount-input {
+    font-weight: 500;
+}
+
+#invoiceItemsTable .profit-cell {
+    display: block;
+    text-align: center;
+    padding: 0.375rem;
+    border-radius: 4px;
+    background: #f8fafc;
+}
+
+#invoiceItemsTable .subtotal-cell {
+    display: block;
+    text-align: center;
+    font-weight: 600;
+    color: #059669;
+}
+
+/* Vendor Autocomplete Dropdown */
+#vendorDropdown,
+#returnVendorDropdown {
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+    #vendorDropdown.show,
+    #returnVendorDropdown.show {
+        display: block;
+    }
+
+.dropdown-item:hover {
+    background-color: #e9ecef;
+    cursor: pointer;
+}
+
+/* Color Swatch */
+.color-swatch {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    border: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+.dropdown-item .color-swatch {
+    flex-shrink: 0;
+}
+
+/* Color Palette Grid */
+.color-palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+    gap: 6px;
+    padding: 10px;
+    max-height: 300px;
+    background: #f8f9fa;
+}
+
+/* Custom scrollbar for color palette */
+.color-palette-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.color-palette-grid::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 4px;
+}
+
+.color-palette-grid::-webkit-scrollbar-thumb {
+    background: #adb5bd;
+    border-radius: 4px;
+}
+
+.color-palette-grid::-webkit-scrollbar-thumb:hover {
+    background: #6c757d;
+}
+
+.color-palette-item {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.color-palette-item:hover {
+    transform: scale(1.15);
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    z-index: 20;
+}
+
+.color-palette-item:active {
+    transform: scale(1.05);
+}
+
+.color-palette-item:hover .color-palette-label {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.color-palette-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
+    color: white;
+    font-size: 0.65rem;
+    padding: 4px 2px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+    font-weight: 500;
+}
+
+/* Dropdown menu styling for color palette */
+#invoiceItemsTable .dropdown-menu,
+#returnItemsTable .dropdown-menu {
+    min-width: 300px;
+    max-width: 350px;
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+#invoiceItemsTable .dropdown-menu .p-2,
+#returnItemsTable .dropdown-menu .p-2 {
+    border-bottom: 1px solid #dee2e6;
+    background: white;
+    border-radius: 8px 8px 0 0;
+}
+
+/* Size Input Styling */
+.size-input {
+    text-align: center;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 0.375rem 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.size-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+    outline: none;
+}
+
+.size-input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* Product Autocomplete in Table */
+#invoiceItemsTable tbody td,
+#returnItemsTable tbody td {
+    position: relative;
+    overflow: visible;
+}
+
+#invoiceItemsTable .position-relative,
+#returnItemsTable .position-relative {
+    position: relative;
+}
+
+#invoiceItemsTable .dropdown-menu,
+#returnItemsTable .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1060 !important;
+    width: 100%;
+    min-width: 300px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+    #invoiceItemsTable .dropdown-menu.show,
+    #returnItemsTable .dropdown-menu.show {
+        display: block !important;
+    }
+
+/* Ensure table doesn't clip dropdowns */
+#invoiceItemsTable,
+#returnItemsTable {
+    overflow: visible;
+}
+
+#invoiceItemsTable tbody,
+#returnItemsTable tbody {
+    overflow: visible;
+}
+
+#invoiceItemsTable tbody tr,
+#returnItemsTable tbody tr {
+    overflow: visible;
+}
+
+#invoiceItemsTable tbody td,
+#returnItemsTable tbody td {
+    overflow: visible;
+}
+
+.table-responsive {
+    overflow: visible !important;
+}
+
+/* Ensure cards don't clip dropdowns */
+.card-body {
+    overflow: visible !important;
+}
+
+.card {
+    overflow: visible !important;
+}
+
+/* Position relative for color containers */
+#invoiceItemsTable .position-relative,
+#returnItemsTable .position-relative {
+    position: relative;
+}
+
+/* Make color palette dropdowns wider in tables */
+#invoiceItemsTable .color-palette-grid,
+#returnItemsTable .color-palette-grid {
+    min-width: 280px;
+}
+
+/* Invoice Items Table */
+#invoiceItemsTable tbody tr,
+#returnItemsTable tbody tr {
+    vertical-align: middle;
+}
+
+    #invoiceItemsTable tbody tr select,
+    #invoiceItemsTable tbody tr input,
+    #returnItemsTable tbody tr select,
+    #returnItemsTable tbody tr input {
+        font-size: 0.9rem;
+    }
+
+.product-select,
+.variant-select {
+    width: 100%;
+}
+
+.subtotal-cell {
+    font-weight: 600;
+    color: #0d6efd;
+}
+
+/* Total Amount Card */
+#totalAmount,
+#totalRefund {
+    font-size: 1.5rem;
+}
+
+/* Statistics Cards */
+.stat-card {
+    border-left: 4px solid #0d6efd;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+.stat-card .card-title {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.stat-card .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.stat-card .stat-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* Badge Styles */
+.badge-purchased {
+    background-color: #0d6efd;
+}
+
+.badge-returned {
+    background-color: #dc3545;
+}
+
+.badge-net {
+    background-color: #198754;
+}
+
+.badge-sold-count {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge-sold-value {
+    background-color: #20c997;
+}
+
+/* Action Buttons */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Invoice Details Modal */
+#invoiceDetailsContent .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+    #invoiceDetailsContent .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    #invoiceDetailsContent .detail-label {
+        font-weight: 600;
+        color: #495057;
+    }
+
+    #invoiceDetailsContent .detail-value {
+        color: #212529;
+    }
+
+/* Loading Spinner */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-border-custom {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #invoiceItemsTable,
+    #returnItemsTable {
+        font-size: 0.85rem;
+    }
+
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+
+    #totalAmount,
+    #totalRefund {
+        font-size: 1.2rem;
+    }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h5 {
+        color: #495057;
+    }
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}

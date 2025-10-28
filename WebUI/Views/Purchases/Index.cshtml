@@ -1,29 +1,278 @@
 ﻿@{
+    ViewBag.Title = "Purchases";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var userName = User.Identity?.Name ?? "Guest";
-    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Unknown";
-    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Unknown";
 }
 
-<div class="d-flex flex-column align-items-center justify-content-center" style="height:80vh;">
-    <h1 style="font-weight:700; color:#2563eb;">@controllerName</h1>
+<link rel="stylesheet" href="~/css/purchases.css" />
 
-    <p style="font-size:1.2rem; margin-top:10px;">
-        Logged in as:
-        <span style="font-weight:600; color:#16a34a;">@userName</span>
-        (<span style="color:#64748b;">@role</span>)
-    </p>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h4 class="mb-3 fw-bold text-primary">
+            <i class="fas fa-shopping-cart"></i> Purchase Management
+        </h4>
 
-    @if (User.IsInRole("Admin"))
-    {
-        <p style="color:#334155; margin-top:15px;">You have full administrative access to this module.</p>
-    }
-    else if (User.IsInRole("Cashier"))
-    {
-        <p style="color:#f59e0b; margin-top:15px;">Limited cashier access — certain actions may be restricted.</p>
-    }
-    else
-    {
-        <p style="color:#dc2626; margin-top:15px;">Unknown or unauthorized role.</p>
-    }
+        <ul class="nav nav-tabs mb-3" id="purchaseTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="new-invoice-tab" data-bs-toggle="tab"
+                        data-bs-target="#newInvoice" type="button" role="tab">
+                    <i class="fas fa-plus-circle"></i> New Invoice
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="all-invoices-tab" data-bs-toggle="tab"
+                        data-bs-target="#allInvoices" type="button" role="tab">
+                    <i class="fas fa-file-invoice"></i> All Invoices
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="returns-tab" data-bs-toggle="tab"
+                        data-bs-target="#returns" type="button" role="tab">
+                    <i class="fas fa-undo"></i> Returns
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="stats-tab" data-bs-toggle="tab"
+                        data-bs-target="#statistics" type="button" role="tab">
+                    <i class="fas fa-chart-bar"></i> Statistics
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="purchaseTabsContent">
+            
+            <!-- ==================== NEW INVOICE TAB ==================== -->
+            <div class="tab-pane fade show active" id="newInvoice" role="tabpanel">
+                <form id="invoiceForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="vendorInput" class="form-label">Vendor *</label>
+                            <input type="text" class="form-control" id="vendorInput" placeholder="Type vendor name..." required autocomplete="off">
+                            <div id="vendorDropdown" class="dropdown-menu" style="width: 100%;"></div>
+                            <input type="hidden" id="vendorId">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="purchaseDate" class="form-label">Purchase Date *</label>
+                            <input type="date" class="form-control" id="purchaseDate" required>
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">Invoice Items</h5>
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="addProductBtn">
+                            <i class="fas fa-plus"></i> Add Product
+                        </button>
+                    </div>
+
+                    <div id="productsContainer">
+                        <!-- Dynamic product blocks will be added here -->
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6 offset-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h5 class="mb-0">Total Amount: <span id="totalAmount" class="text-success fw-bold">0.00 EGP</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="fas fa-save"></i> Save Invoice
+                        </button>
+                        <button type="button" class="btn btn-secondary px-4" id="clearInvoiceBtn">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ==================== ALL INVOICES TAB ==================== -->
+            <div class="tab-pane fade" id="allInvoices" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="allInvoicesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Invoice No.</th>
+                                <th>Vendor</th>
+                                <th>Purchase Date</th>
+                                <th>Total Amount</th>
+                                <th>Items Count</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== RETURNS TAB ==================== -->
+            <div class="tab-pane fade" id="returns" role="tabpanel">
+                <div class="mb-3">
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#returnModal">
+                        <i class="fas fa-undo"></i> Create Return
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle" id="returnsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Return No.</th>
+                                <th>Vendor</th>
+                                <th>Return Date</th>
+                                <th>Total Refund</th>
+                                <th>Reason</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== STATISTICS TAB ==================== -->
+            <div class="tab-pane fade" id="statistics" role="tabpanel">
+                <div class="row" id="statsContainer">
+                    <!-- Stats cards will be populated via JavaScript -->
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
+
+<!-- ==================== INVOICE DETAILS MODAL ==================== -->
+<div class="modal fade" id="invoiceDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Invoice Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="invoiceDetailsContent">
+                <!-- Content populated via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== RETURN MODAL ==================== -->
+<div class="modal fade" id="returnModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-undo"></i> Create Purchase Return
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="returnForm">
+                    <!-- Step 1: Vendor Selection -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="returnVendorSelect" class="form-label fw-bold">
+                                <i class="fas fa-user-tie"></i> Select Vendor *
+                            </label>
+                            <select class="form-select" id="returnVendorSelect" required>
+                                <option value="">-- Choose Vendor --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="returnDate" class="form-label fw-bold">
+                                <i class="fas fa-calendar"></i> Return Date *
+                            </label>
+                            <input type="date" class="form-control" id="returnDate" required>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Invoice Selection -->
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="returnInvoiceSelect" class="form-label fw-bold">
+                                <i class="fas fa-file-invoice"></i> Select Purchase Invoice *
+                            </label>
+                            <select class="form-select" id="returnInvoiceSelect" required disabled>
+                                <option value="">-- First select a vendor --</option>
+                            </select>
+                            <small class="text-muted">Only invoices from the selected vendor will appear</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="returnReason" class="form-label fw-bold">
+                            <i class="fas fa-comment-alt"></i> Return Reason
+                        </label>
+                        <textarea class="form-control" id="returnReason" rows="2" placeholder="Optional reason for return..."></textarea>
+                    </div>
+
+                    <hr>
+
+                    <!-- Step 3: Products from Invoice -->
+                    <div id="returnProductsSection" style="display: none;">
+                        <h6 class="mb-3 text-primary">
+                            <i class="fas fa-box-open"></i> Products from Invoice
+                            <small class="text-muted">(Select quantities to return)</small>
+                        </h6>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover align-middle" id="returnItemsTable">
+                                <thead class="table-warning">
+                                    <tr>
+                                        <th style="width: 5%;">
+                                            <input type="checkbox" id="selectAllReturnItems" title="Select All">
+                                        </th>
+                                        <th style="width: 20%;">Product</th>
+                                        <th style="width: 12%;">Color</th>
+                                        <th style="width: 8%;">Size</th>
+                                        <th style="width: 10%;">Purchased Qty</th>
+                                        <th style="width: 12%;">Return Qty</th>
+                                        <th style="width: 12%;">Unit Price</th>
+                                        <th style="width: 13%;">Refund Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="returnItemsBody">
+                                    <!-- Auto-populated from selected invoice -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="card bg-light border-warning">
+                                    <div class="card-body">
+                                        <h5 class="mb-0">
+                                            Total Refund: 
+                                            <span id="totalRefund" class="text-danger fw-bold">0.00 EGP</span>
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="button" class="btn btn-warning" id="saveReturnBtn" disabled>
+                    <i class="fas fa-save"></i> Save Return
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/purchases.js" asp-append-version="true"></script>
+}

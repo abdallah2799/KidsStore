@@ -18,6 +18,18 @@ namespace WebUI.Controllers
             _logger = logger;
         }
 
+        // Minimal list for autocomplete
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var vendors = await _vendorService.GetAllAsync();
+            var result = vendors
+                .OrderBy(v => v.Name)
+                .Select(v => new { v.Id, v.Name })
+                .ToList();
+            return Json(result);
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 8)
         {
@@ -57,10 +69,10 @@ namespace WebUI.Controllers
                 var vendor = new Vendor
                 {
                     Name = model.Name,
-                    CodePrefix = model.CodePrefix,
+                    CodePrefix = model.CodePrefix ?? string.Empty,
                     ContactInfo = model.ContactInfo,
-                    Address = model.Address,
-                    Notes = model.Notes
+                    Address = model.Address ?? string.Empty,
+                    Notes = model.Notes ?? string.Empty
                 };
 
                 var added = await _vendorService.AddAsync(vendor);
@@ -80,10 +92,10 @@ namespace WebUI.Controllers
             {
                 Id = model.Id,
                 Name = model.Name,
-                CodePrefix = model.CodePrefix,
+                CodePrefix = model.CodePrefix ?? string.Empty,
                 ContactInfo = model.ContactInfo,
-                Address = model.Address,
-                Notes = model.Notes
+                Address = model.Address ?? string.Empty,
+                Notes = model.Notes ?? string.Empty
             };
 
             var updated = await _vendorService.UpdateAsync(vendor);

@@ -57,6 +57,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 
 // ==========================================
 // 3. Session & Authentication Configuration
@@ -137,43 +139,11 @@ app.MapControllerRoute(
     pattern: "{controller=Account}/{action=Login}/{id?}"
 ).WithStaticAssets();
 
-// ==========================================
-// 7. Database Migration & Default Seeding
-// ==========================================
-// Seeder function
-async Task SeedVendorsAsync(AppDbContext context)
-{
-    if (await context.Vendors.AnyAsync())
-    {
-        Console.WriteLine("الفيندورز موجودة بالفعل، لن يتم إضافة بيانات جديدة.");
-        return;
-    }
-
-    var vendors = new List<Vendor>
-    {
-        new Vendor { Name = "المورد ألفا", CodePrefix = "MA", Address = "القاهرة، مصر", ContactInfo = "01000000001", Notes = "أفضل مورد للأجهزة الإلكترونية" },
-        new Vendor { Name = "المورد بيتا", CodePrefix = "MB", Address = "الإسكندرية، مصر", ContactInfo = "01000000002", Notes = "مورد مستلزمات مكتبية" },
-        new Vendor { Name = "المورد جاما", CodePrefix = "MG", Address = "الجيزة، مصر", ContactInfo = "01000000003", Notes = "لديه خبرة 10 سنوات" },
-        new Vendor { Name = "المورد دلتا", CodePrefix = "MD", Address = "طنطا، مصر", ContactInfo = "01000000004", Notes = "" },
-        new Vendor { Name = "المورد إبسلون", CodePrefix = "ME", Address = "منصورة، مصر", ContactInfo = "01000000005", Notes = "سريع في التسليم" },
-        new Vendor { Name = "المورد زيتا", CodePrefix = "MZ", Address = "الإسماعيلية، مصر", ContactInfo = "01000000006", Notes = "" },
-        new Vendor { Name = "المورد إيتا", CodePrefix = "MET", Address = "السويس، مصر", ContactInfo = "01000000007", Notes = "" },
-        new Vendor { Name = "المورد ثيتا", CodePrefix = "MTH", Address = "شرم الشيخ، مصر", ContactInfo = "01000000008", Notes = "مورد سياحي وتجهيز الفنادق" },
-        new Vendor { Name = "المورد يوتا", CodePrefix = "MI", Address = "الغردقة، مصر", ContactInfo = "01000000009", Notes = "" },
-        new Vendor { Name = "المورد كابا", CodePrefix = "MK", Address = "الأقصر، مصر", ContactInfo = "01000000010", Notes = "يقدم خصومات عند الشراء بالجملة" }
-    };
-
-    await context.Vendors.AddRangeAsync(vendors);
-    await context.SaveChangesAsync();
-
-    Console.WriteLine("تم إضافة 10 موردين بنجاح.");
-}
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    Log.Information("Seeding started");
-    await SeedVendorsAsync(context);
-    context.Database.Migrate();
+    Log.Information("Applying migrations and seeding data");
+    await Infrastructure.Persistence.DbSeeder.SeedAsync(context);
 
     if (!context.Users.Any())
     {

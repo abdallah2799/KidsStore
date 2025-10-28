@@ -26,6 +26,11 @@ namespace Infrastructure.Persistence.Configurations
             builder.Property(p => p.SellingPrice)
                 .HasColumnType("decimal(18,2)");
 
+            // Optional discount limit with explicit precision to avoid default mapping warnings
+            builder.Property(p => p.DiscountLimit)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired(false);
+
             builder.Property(p => p.IsActive)
                 .HasDefaultValue(true);
 

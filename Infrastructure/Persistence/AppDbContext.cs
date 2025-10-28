@@ -20,6 +20,8 @@ namespace Infrastructure.Persistence
         public DbSet<SalesItem> SalesItems { get; set; }
         public DbSet<ReturnInvoice> ReturnInvoices { get; set; }
         public DbSet<ReturnItem> ReturnItems { get; set; }
+        public DbSet<PurchaseReturnInvoice> PurchaseReturnInvoices { get; set; }
+        public DbSet<PurchaseReturnItem> PurchaseReturnItems { get; set; }
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
