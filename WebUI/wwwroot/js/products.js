@@ -357,15 +357,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="badge status-badge ${p.isActive ? 'bg-success' : 'bg-secondary'}">${p.isActive ? 'Active' : 'Inactive'}</span>
                 </td>
                 <td class="text-center">
-                    <div class="form-check form-switch d-inline-block align-middle me-2" title="Toggle Active">
-                        <input class="form-check-input toggle-active" type="checkbox" data-id="${p.id}" ${p.isActive ? 'checked' : ''}>
+                    <div class="d-inline-flex align-items-center gap-1">
+                        <div class="form-check form-switch d-inline-block" title="Toggle Active">
+                            <input class="form-check-input toggle-active" type="checkbox" data-id="${p.id}" ${p.isActive ? 'checked' : ''}>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary edit-btn" data-bs-toggle="modal" data-bs-target="#productModal" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger delete-btn" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                    <button class="btn btn-sm btn-outline-primary me-1 edit-btn" data-bs-toggle="modal" data-bs-target="#productModal">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger delete-btn">
-                        <i class="fas fa-trash"></i>
-                    </button>
                 </td>
             `;
             

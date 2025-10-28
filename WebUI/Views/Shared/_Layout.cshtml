@@ -151,11 +151,24 @@
                         <span class="user-name">@currentUser</span>
                         <span class="user-role">@currentRole</span>
                     </div>
-                    <i class="fas fa-chevron-down" style="color: #64748b; font-size: 0.75rem;"></i>
+                    <i class="fas fa-chevron-down" style="color: var(--text-muted); font-size: 0.75rem;"></i>
                 </div>
 
                 <!-- Dropdown Menu -->
                 <div id="userDropdown" class="user-dropdown shadow-sm">
+                    <div class="dropdown-item theme-toggle-container">
+                        <div class="d-flex align-items-center justify-content-between w-100">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-moon me-2" id="themeIcon"></i>
+                                <span id="themeText">Dark Mode</span>
+                            </div>
+                            <label class="theme-switch mb-0">
+                                <input type="checkbox" id="themeToggle">
+                                <span class="theme-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
                     <a href="@Url.Action("Index", "Settings")" class="dropdown-item">
                         <i class="fas fa-cog me-2 text-primary"></i> Settings
                     </a>

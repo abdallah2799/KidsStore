@@ -43,15 +43,15 @@
         }
         .section-header h3 {
             margin: 0;
-            color: #333;
+            color: var(--text-primary);
         }
         .section-header p {
             margin: 0;
-            color: #6c757d;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
         .table-hover tbody tr:hover {
-            background-color: #f8f9fa;
+            background-color: var(--surface-hover);
         }
         .badge-rank {
             font-size: 1rem;
@@ -859,7 +859,7 @@
                 }
 
                 data.forEach(item => {
-                    const colorStyle = item.color ? `background-color: ${item.color}` : 'background-color: #ddd';
+                    const colorStyle = item.color ? `background-color: ${item.color}` : 'background-color: var(--border)';
                     tbody.append(`
                         <tr>
                             <td><small>${item.productName}</small></td>

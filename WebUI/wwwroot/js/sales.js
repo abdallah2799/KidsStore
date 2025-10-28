@@ -17,7 +17,10 @@ function initializeSalesPage() {
     initializeRow(0);
 
     // Amount paid input change
-    document.getElementById('amountPaid').addEventListener('input', calculateChange);
+    const amountPaidInput = document.getElementById('amountPaid');
+    amountPaidInput.addEventListener('input', calculateChange);
+    amountPaidInput.addEventListener('keyup', calculateChange);
+    amountPaidInput.addEventListener('change', calculateChange);
     
     // Save Invoice Button
     document.getElementById('saveInvoiceBtn').addEventListener('click', function() {
@@ -407,7 +410,17 @@ function calculateChange() {
     const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
     const change = amountPaid - netTotal;
 
-    document.getElementById('change').textContent = (change >= 0 ? change.toFixed(2) : '0.00') + ' EGP';
+    const changeElement = document.getElementById('change');
+    changeElement.textContent = change.toFixed(2) + ' EGP';
+    
+    // Change color based on positive/negative
+    if (change < 0) {
+        changeElement.classList.remove('text-success');
+        changeElement.classList.add('text-danger');
+    } else {
+        changeElement.classList.remove('text-danger');
+        changeElement.classList.add('text-success');
+    }
 }
 
 function showProductSearchModal(searchTerm, index) {

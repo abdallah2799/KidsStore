@@ -33,3 +33,69 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add('sidebar-collapsed');
     }
 });
+
+// 🌓 Dark Mode Toggle
+document.addEventListener("DOMContentLoaded", () => {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    const body = document.body;
+
+    // Check if elements exist
+    if (!themeToggle || !themeIcon || !themeText) {
+        return;
+    }
+
+    // Check for saved theme preference or default to 'light'
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    
+    // Apply saved theme on load
+    if (currentTheme === 'dark') {
+        body.setAttribute('data-theme', 'dark');
+        themeToggle.checked = true;
+        updateThemeUI(true);
+    }
+
+    // Toggle theme on switch change
+    themeToggle.addEventListener('change', function() {
+        if (this.checked) {
+            body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            updateThemeUI(true);
+            applyTableTheme(true);
+        } else {
+            body.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            updateThemeUI(false);
+            applyTableTheme(false);
+        }
+    });
+
+    function updateThemeUI(isDark) {
+        if (isDark) {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+            themeText.textContent = 'Light Mode';
+        } else {
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+            themeText.textContent = 'Dark Mode';
+        }
+    }
+
+    function applyTableTheme(isDark) {
+        const tables = document.querySelectorAll('.table');
+        tables.forEach(table => {
+            if (isDark) {
+                table.classList.add('table-dark');
+            } else {
+                table.classList.remove('table-dark');
+            }
+        });
+    }
+
+    // Apply table theme on initial load
+    if (currentTheme === 'dark') {
+        applyTableTheme(true);
+    }
+});

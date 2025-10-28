@@ -405,3 +405,109 @@ table th {
     border: 1px solid #dee2e6;
     vertical-align: middle;
 }
+
+/* Products Table Layout */
+#productsTable {
+    table-layout: auto;
+    width: 100%;
+}
+
+#productsTable thead th {
+    white-space: nowrap;
+    font-size: 0.875rem;
+    padding: 0.75rem 0.5rem;
+}
+
+#productsTable tbody td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Specific column sizing */
+#productsTable th:nth-child(1),  /* # */
+#productsTable td:nth-child(1) {
+    width: 50px;
+    text-align: center;
+}
+
+#productsTable th:nth-child(2),  /* Code */
+#productsTable td:nth-child(2) {
+    width: 100px;
+}
+
+#productsTable th:nth-child(3),  /* Name */
+#productsTable td:nth-child(3) {
+    min-width: 150px;
+}
+
+#productsTable th:nth-child(4),  /* Vendor */
+#productsTable td:nth-child(4) {
+    width: 120px;
+}
+
+#productsTable th:nth-child(5),  /* Season */
+#productsTable td:nth-child(5) {
+    width: 100px;
+}
+
+#productsTable th:nth-child(6),  /* Buying Price */
+#productsTable td:nth-child(6) {
+    width: 110px;
+}
+
+#productsTable th:nth-child(7),  /* Selling Price */
+#productsTable td:nth-child(7) {
+    width: 110px;
+}
+
+#productsTable th:nth-child(8),  /* Profit */
+#productsTable td:nth-child(8) {
+    width: 90px;
+}
+
+#productsTable th:nth-child(9),  /* Total Stock */
+#productsTable td:nth-child(9) {
+    width: 90px;
+    text-align: center;
+}
+
+#productsTable th:nth-child(10), /* Colors */
+#productsTable td:nth-child(10) {
+    width: 100px;
+}
+
+#productsTable th:nth-child(11), /* Sizes */
+#productsTable td:nth-child(11) {
+    width: 100px;
+}
+
+#productsTable th:nth-child(12), /* Status */
+#productsTable td:nth-child(12) {
+    width: 90px;
+    text-align: center;
+}
+
+#productsTable th:nth-child(13), /* Actions */
+#productsTable td:nth-child(13) {
+    width: 140px;
+}
+
+/* Action buttons - make them fit side by side */
+#productsTable tbody td:last-child {
+    white-space: nowrap;
+    min-width: 140px;
+}
+
+#productsTable .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+#productsTable .form-check-input {
+    cursor: pointer;
+}
+
+/* Make table responsive but maintain structure */
+.table-responsive {
+    overflow-x: auto;
+}
