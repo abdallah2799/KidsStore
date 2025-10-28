@@ -20,17 +20,17 @@
 }
 
 .product-code-input {
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--border);
     transition: border-color 0.2s;
 }
 
 .product-code-input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--primary);
     box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.15);
 }
 
 .product-name-display {
-    background-color: #f8fafc;
+    background-color: var(--surface-hover);
 }
 
 .color-select,
@@ -40,15 +40,15 @@
 
 .color-select:disabled,
 .size-select:disabled {
-    background-color: #f1f5f9;
+    background-color: var(--input-disabled-bg);
     cursor: not-allowed;
 }
 
 .unit-price-display,
 .total-display {
-    background-color: #f8fafc;
+    background-color: var(--surface-hover);
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary);
 }
 
 .quantity-input,
@@ -87,9 +87,9 @@
 #discountWarning {
     font-size: 0.875rem;
     padding: 0.5rem;
-    background-color: #fee2e2;
+    background-color: var(--danger-light);
     border-radius: 8px;
-    border-left: 4px solid #dc2626;
+    border-left: 4px solid var(--danger);
 }
 
 /* Product search modal */
@@ -98,13 +98,13 @@
 }
 
 #productSearchModal .table-hover tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--surface-hover);
 }
 
 /* Payment method dropdown */
 #paymentMethod {
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary);
 }
 
 /* Responsive table */

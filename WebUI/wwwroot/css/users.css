@@ -1,0 +1,25 @@
+/* users.css - Users Page Specific Styles */
+
+.user-card {
+    border-radius: 8px;
+    transition: var(--transition);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.user-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.badge-role {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+.modal-header.user-modal-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--text-inverse);
+}
