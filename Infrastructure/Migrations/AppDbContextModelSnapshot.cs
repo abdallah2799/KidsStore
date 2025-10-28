@@ -185,6 +185,36 @@ namespace Infrastructure.Migrations
                     b.ToTable("PurchaseReturnItems");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ReturnInvoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ReturnDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SalesInvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalRefund")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SalesInvoiceId");
+
+                    b.ToTable("ReturnInvoices", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -328,36 +358,6 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PurchaseInvoiceId");
 
                     b.ToTable("PurchaseItems", (string)null);
-                });
-
-            modelBuilder.Entity("ReturnInvoice", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ReturnDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SalesInvoiceId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalRefund")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SalesInvoiceId");
-
-                    b.ToTable("ReturnInvoices", (string)null);
                 });
 
             modelBuilder.Entity("ReturnItem", b =>
@@ -536,6 +536,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("PurchaseReturnInvoice");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ReturnInvoice", b =>
+                {
+                    b.HasOne("SalesInvoice", "SalesInvoice")
+                        .WithMany()
+                        .HasForeignKey("SalesInvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalesInvoice");
+                });
+
             modelBuilder.Entity("PurchaseInvoice", b =>
                 {
                     b.HasOne("Domain.Entities.Vendor", "Vendor")
@@ -566,17 +577,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("PurchaseInvoice");
                 });
 
-            modelBuilder.Entity("ReturnInvoice", b =>
-                {
-                    b.HasOne("SalesInvoice", "SalesInvoice")
-                        .WithMany()
-                        .HasForeignKey("SalesInvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SalesInvoice");
-                });
-
             modelBuilder.Entity("ReturnItem", b =>
                 {
                     b.HasOne("Domain.Entities.ProductVariant", "ProductVariant")
@@ -585,7 +585,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ReturnInvoice", "ReturnInvoice")
+                    b.HasOne("Domain.Entities.ReturnInvoice", "ReturnInvoice")
                         .WithMany("Items")
                         .HasForeignKey("ReturnInvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -636,6 +636,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("Items");
                 });
 
+            modelBuilder.Entity("Domain.Entities.ReturnInvoice", b =>
+                {
+                    b.Navigation("Items");
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Navigation("SalesInvoices");
@@ -647,11 +652,6 @@ namespace Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("PurchaseInvoice", b =>
-                {
-                    b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("ReturnInvoice", b =>
                 {
                     b.Navigation("Items");
                 });

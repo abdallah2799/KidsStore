@@ -14,33 +14,13 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 // ==========================================
-// 1. Configure Serilog (SQL + File + Console)
+// 1. Configure Serilog (File + Console only at startup)
 // ==========================================
-var columnOptions = new ColumnOptions
-{
-    AdditionalColumns = new Collection<SqlColumn>
-    {
-        new SqlColumn("UserName", System.Data.SqlDbType.NVarChar, dataLength: 256),
-        new SqlColumn("RequestPath", System.Data.SqlDbType.NVarChar, dataLength: 512),
-        new SqlColumn("SourceContext", System.Data.SqlDbType.NVarChar, dataLength: 256),
-        new SqlColumn("MachineName", System.Data.SqlDbType.NVarChar, dataLength: 128)
-    }
-};
-
+// Note: SQL Server logging will be enabled after database is created
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
-    .WriteTo.MSSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-        sinkOptions: new MSSqlServerSinkOptions
-        {
-            TableName = "Logs",
-            AutoCreateSqlTable = true
-        },
-        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information,
-        columnOptions: columnOptions
-    )
     .CreateLogger();
 
 builder.Host.UseSerilog();
@@ -146,37 +126,14 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    Log.Information("Applying migrations and seeding data");
+    
+    // Ensure database is created and migrations are applied
+    Log.Information("Ensuring database is created and up to date");
+    await context.Database.MigrateAsync();
+    Log.Information("Database is ready");
+    
+    Log.Information("Seeding data");
     await Infrastructure.Persistence.DbSeeder.SeedAsync(context);
-
-    if (!context.Users.Any())
-    {
-        var admin = new Domain.Entities.User
-        {
-            UserName = "admin",
-            Role = Domain.Entities.UserRole.Admin,
-            IsActive = true
-        };
-        admin.SetPassword("admin123");
-
-        var cashier = new Domain.Entities.User
-        {
-            UserName = "cashier",
-            Role = Domain.Entities.UserRole.Cashier,
-            IsActive = true
-        };
-        cashier.SetPassword("cashier123");
-
-        context.Users.AddRange(admin, cashier);
-        context.SaveChanges();
-
-        Log.Information("Default users seeded: admin / cashier");
-    }
-    else
-    {
-        Log.Information("Users already exist — skipping seeding");
-    }
-
     Log.Information("Seeding finished, starting app");
 }
 
