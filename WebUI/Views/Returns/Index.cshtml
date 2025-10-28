@@ -214,7 +214,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error searching invoices');
+                showToast('Error searching invoices', 'error');
             });
     }
 
@@ -256,7 +256,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error loading invoice details');
+                showToast('Error loading invoice details', 'error');
             });
     }
 
@@ -362,7 +362,7 @@
         const itemsToReturn = invoiceItems.filter(item => (item.returnQty || 0) > 0);
 
         if (itemsToReturn.length === 0) {
-            alert('Please select at least one item to return');
+            showToast('Please select at least one item to return', 'warning');
             return;
         }
 
@@ -410,12 +410,12 @@
                 const printModal = new bootstrap.Modal(document.getElementById('printModal'));
                 printModal.show();
             } else {
-                alert('Error: ' + data.message);
+                showToast('Error: ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error processing return');
+            showToast('Error processing return', 'error');
         });
     }
 

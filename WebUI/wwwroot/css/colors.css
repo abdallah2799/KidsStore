@@ -1,0 +1,222 @@
+/* colors.css - Centralized Color Schema for Light and Dark Mode */
+
+:root {
+    /* Primary Colors */
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --primary-light: #3b82f6;
+    --primary-lighter: #60a5fa;
+    
+    /* Secondary Colors */
+    --secondary: #64748b;
+    --secondary-dark: #475569;
+    --secondary-light: #94a3b8;
+    
+    /* Accent Colors */
+    --accent: #16a34a;
+    --accent-dark: #15803d;
+    --accent-light: #22c55e;
+    
+    /* State Colors */
+    --success: #16a34a;
+    --success-dark: #15803d;
+    --success-light: #bbf7d0;
+    
+    --danger: #dc2626;
+    --danger-dark: #b91c1c;
+    --danger-light: #fecaca;
+    
+    --warning: #f59e0b;
+    --warning-dark: #d97706;
+    --warning-light: #fef3c7;
+    
+    --info: #3b82f6;
+    --info-dark: #2563eb;
+    --info-light: #bfdbfe;
+    
+    /* Background Colors */
+    --background: #f8fafc;
+    --background-secondary: #f1f5f9;
+    --surface: #ffffff;
+    --surface-hover: #f8fafc;
+    
+    /* Text Colors */
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --text-disabled: #94a3b8;
+    --text-inverse: #ffffff;
+    
+    /* Border Colors */
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --border-dark: #cbd5e1;
+    
+    /* Shadow */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    
+    /* Sidebar Colors */
+    --sidebar-bg: #1e293b;
+    --sidebar-text: #94a3b8;
+    --sidebar-text-active: #ffffff;
+    --sidebar-hover: #334155;
+    --sidebar-border: #334155;
+    
+    /* Header Colors */
+    --header-bg: #ffffff;
+    --header-border: #e2e8f0;
+    
+    /* Card Colors */
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    
+    /* Input Colors */
+    --input-bg: #ffffff;
+    --input-border: #e2e8f0;
+    --input-focus-border: #3b82f6;
+    --input-disabled-bg: #f1f5f9;
+    
+    /* Transition */
+    --transition: all 0.3s ease;
+    --transition-fast: all 0.15s ease;
+}
+
+/* Dark Mode Colors */
+[data-theme="dark"] {
+    /* Primary Colors (Keep vibrant in dark mode) */
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: #60a5fa;
+    --primary-lighter: #93c5fd;
+    
+    /* Secondary Colors */
+    --secondary: #94a3b8;
+    --secondary-dark: #cbd5e1;
+    --secondary-light: #64748b;
+    
+    /* Accent Colors */
+    --accent: #22c55e;
+    --accent-dark: #16a34a;
+    --accent-light: #4ade80;
+    
+    /* State Colors */
+    --success: #22c55e;
+    --success-dark: #16a34a;
+    --success-light: #166534;
+    
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --danger-light: #7f1d1d;
+    
+    --warning: #fbbf24;
+    --warning-dark: #f59e0b;
+    --warning-light: #78350f;
+    
+    --info: #60a5fa;
+    --info-dark: #3b82f6;
+    --info-light: #1e3a8a;
+    
+    /* Background Colors */
+    --background: #0f172a;
+    --background-secondary: #1e293b;
+    --surface: #1e293b;
+    --surface-hover: #334155;
+    
+    /* Text Colors */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-disabled: #64748b;
+    --text-inverse: #0f172a;
+    
+    /* Border Colors */
+    --border: #334155;
+    --border-light: #1e293b;
+    --border-dark: #475569;
+    
+    /* Shadow (More subtle in dark mode) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    
+    /* Sidebar Colors */
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #94a3b8;
+    --sidebar-text-active: #ffffff;
+    --sidebar-hover: #1e293b;
+    --sidebar-border: #1e293b;
+    
+    /* Header Colors */
+    --header-bg: #1e293b;
+    --header-border: #334155;
+    
+    /* Card Colors */
+    --card-bg: #1e293b;
+    --card-border: #334155;
+    
+    /* Input Colors */
+    --input-bg: #0f172a;
+    --input-border: #334155;
+    --input-focus-border: #3b82f6;
+    --input-disabled-bg: #1e293b;
+}
+
+/* Base Theme Application */
+body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Smooth transition for theme changes */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Dark Mode Text Classes Override */
+[data-theme="dark"] .text-dark {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .text-body {
+    color: var(--text-primary) !important;
+}
+
+/* Dark Mode Bootstrap Typography */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] label,
+[data-theme="dark"] small {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] a {
+    color: var(--primary-light);
+}
+
+[data-theme="dark"] a:hover {
+    color: var(--primary);
+}

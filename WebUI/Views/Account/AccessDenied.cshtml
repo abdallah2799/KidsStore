@@ -13,10 +13,12 @@
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <!-- Local Font Awesome -->
     <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+    <!-- Color Schema -->
+    <link href="~/css/colors.css" rel="stylesheet" />
 
     <style>
         body {
-            background-color: #f8fafc;
+            background-color: var(--background, #f8fafc);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             align-items: center;
@@ -25,9 +27,9 @@
         }
 
         .denied-card {
-            background-color: #fff;
+            background-color: var(--surface, #fff);
             border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-lg);
             padding: 2.5rem;
             text-align: center;
             max-width: 420px;
@@ -36,32 +38,32 @@
 
         .denied-icon {
             font-size: 4rem;
-            color: #ef4444;
+            color: var(--danger, #ef4444);
             margin-bottom: 1rem;
         }
 
         h2 {
-            color: #1e293b;
+            color: var(--text-primary, #1e293b);
             font-weight: 600;
             margin-bottom: 0.75rem;
         }
 
         p {
-            color: #64748b;
+            color: var(--text-secondary, #64748b);
             font-size: 1rem;
             margin-bottom: 1.5rem;
         }
 
         a.btn-primary {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
+            background-color: var(--primary, #0d6efd);
+            border-color: var(--primary, #0d6efd);
             border-radius: 0.5rem;
             padding: 0.6rem 1.5rem;
             font-weight: 500;
         }
 
             a.btn-primary:hover {
-                background-color: #0b5ed7;
+                background-color: var(--primary-dark, #0b5ed7);
             }
     </style>
 </head>

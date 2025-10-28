@@ -3,13 +3,16 @@
     width: 320px;
     border-radius: 50px;
     padding: 0.6rem 1.2rem;
-    transition: all 0.3s ease;
+    transition: var(--transition);
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--input-border);
 }
 
 .search-input:focus {
     outline: none;
     box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
-    border-color: #2563eb;
+    border-color: var(--input-focus-border);
 }
 
 table th {
@@ -17,7 +20,7 @@ table th {
 }
 
 .table-hover tbody tr:hover {
-    background-color: #f8fafc;
+    background-color: var(--surface-hover);
 }
 
 /* Vendor Modal Enhancements */
@@ -30,12 +33,12 @@ table th {
 }
 
 #vendorModal .modal-header {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     border-bottom: none;
 }
 
 #vendorModal .modal-footer {
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--border);
 }
 
 #vendorModal h6 {
@@ -45,19 +48,19 @@ table th {
 }
 
 #vendorModal .border-bottom {
-    border-color: #e5e7eb !important;
+    border-color: var(--border) !important;
 }
 
 #vendorModal .form-label {
     font-size: 0.875rem;
     margin-bottom: 0.4rem;
-    color: #374151;
+    color: var(--text-secondary);
 }
 
 #vendorModal .input-group-text {
-    background-color: #f3f4f6;
+    background-color: var(--background-secondary);
     border-right: none;
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
 #vendorModal .input-group .form-control {
@@ -65,7 +68,7 @@ table th {
 }
 
 #vendorModal .input-group .form-control:focus {
-    border-left: 1px solid #2563eb;
+    border-left: 1px solid var(--primary);
 }
 
 #vendorModal textarea {
