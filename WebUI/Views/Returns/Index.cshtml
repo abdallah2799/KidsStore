@@ -1,29 +1,450 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var userName = User.Identity?.Name ?? "Guest";
-    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Unknown";
-    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Unknown";
+    ViewData["Title"] = "Sales Return";
 }
 
-<div class="d-flex flex-column align-items-center justify-content-center" style="height:80vh;">
-    <h1 style="font-weight:700; color:#2563eb;">@controllerName</h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="fas fa-undo-alt me-2"></i>Sales Return</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Step 1: Search for Sales Invoice -->
+                    <div id="searchSection">
+                        <h5 class="mb-3">Step 1: Search for Sales Invoice</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Invoice Number</label>
+                                <input type="text" class="form-control" id="searchInvoiceNo" placeholder="Enter invoice number...">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Product Code/Name</label>
+                                <input type="text" class="form-control" id="searchProduct" placeholder="Search by product...">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">From Date</label>
+                                <input type="date" class="form-control" id="searchDateFrom">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">To Date</label>
+                                <input type="date" class="form-control" id="searchDateTo">
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-primary w-100" onclick="searchInvoices()">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Search Results -->
+                        <div id="searchResults" class="mt-4" style="display:none;">
+                            <h6 class="mb-3">Search Results:</h6>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Invoice No.</th>
+                                            <th>Date</th>
+                                            <th>Customer Name</th>
+                                            <th>Total Amount</th>
+                                            <th>Items Count</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="invoiceResultsBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
-    <p style="font-size:1.2rem; margin-top:10px;">
-        Logged in as:
-        <span style="font-weight:600; color:#16a34a;">@userName</span>
-        (<span style="color:#64748b;">@role</span>)
-    </p>
+                    <!-- Step 2: Invoice Details & Return Items Selection -->
+                    <div id="returnSection" style="display:none;">
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Step 2: Select Items to Return</h5>
+                            <button class="btn btn-secondary btn-sm" onclick="resetReturn()">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Search
+                            </button>
+                        </div>
+                        
+                        <!-- Selected Invoice Info -->
+                        <div class="card mb-3 bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Invoice No.:</strong> <span id="selectedInvoiceNo"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Date:</strong> <span id="selectedInvoiceDate"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Customer:</strong> <span id="selectedCustomerName"></span>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>Cashier:</strong> <span id="selectedCashier"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-    @if (User.IsInRole("Admin"))
-    {
-        <p style="color:#334155; margin-top:15px;">You have full administrative access to this module.</p>
-    }
-    else if (User.IsInRole("Cashier"))
-    {
-        <p style="color:#f59e0b; margin-top:15px;">Limited cashier access — certain actions may be restricted.</p>
-    }
-    else
-    {
-        <p style="color:#dc2626; margin-top:15px;">Unknown or unauthorized role.</p>
-    }
+                        <!-- Invoice Items -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="table-secondary">
+                                    <tr>
+                                        <th width="5%">Select</th>
+                                        <th width="15%">Product</th>
+                                        <th width="10%">Color</th>
+                                        <th width="8%">Size</th>
+                                        <th width="10%">Price</th>
+                                        <th width="8%">Sold Qty</th>
+                                        <th width="10%">Discount</th>
+                                        <th width="12%">Return Qty</th>
+                                        <th width="12%">Refund Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoiceItemsBody">
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td colspan="8" class="text-end"><strong>Total Refund:</strong></td>
+                                        <td><strong><span id="totalRefund">0.00</span> EGP</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <!-- Return Notes -->
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">Return Notes (Optional)</label>
+                                <textarea class="form-control" id="returnNotes" rows="2" placeholder="Enter reason for return..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-secondary" onclick="resetReturn()">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </button>
+                            <button class="btn btn-success" onclick="saveReturn()">
+                                <i class="fas fa-save me-1"></i>Save Return
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Return</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2">Are you sure you want to process this return?</p>
+                <div class="alert alert-info mb-0">
+                    <strong>Total Refund Amount:</strong> <span id="confirmRefundAmount"></span> EGP<br>
+                    <strong>Items to Return:</strong> <span id="confirmItemCount"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="confirmReturn()">
+                    <i class="fas fa-check me-1"></i>Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Receipt Modal -->
+<div class="modal fade" id="printModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i>Return Successful</h5>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-3">Return invoice has been created successfully!</p>
+                <p class="text-muted">Return Invoice No.: <strong id="returnInvoiceNo"></strong></p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" onclick="finishReturn()">
+                    <i class="fas fa-times me-1"></i>Close
+                </button>
+                <button type="button" class="btn btn-primary" onclick="printReturnReceipt()">
+                    <i class="fas fa-print me-1"></i>Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedInvoiceId = null;
+    let invoiceItems = [];
+    let createdReturnInvoiceId = null;
+
+    // Search for invoices
+    function searchInvoices() {
+        const invoiceNo = document.getElementById('searchInvoiceNo').value.trim();
+        const product = document.getElementById('searchProduct').value.trim();
+        const dateFrom = document.getElementById('searchDateFrom').value;
+        const dateTo = document.getElementById('searchDateTo').value;
+
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (invoiceNo) params.append('invoiceNo', invoiceNo);
+        if (product) params.append('product', product);
+        if (dateFrom) params.append('dateFrom', dateFrom);
+        if (dateTo) params.append('dateTo', dateTo);
+
+        fetch(`/Returns/SearchInvoices?${params.toString()}`)
+            .then(response => response.json())
+            .then(data => {
+                displaySearchResults(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error searching invoices');
+            });
+    }
+
+    // Display search results
+    function displaySearchResults(invoices) {
+        const resultsBody = document.getElementById('invoiceResultsBody');
+        const resultsSection = document.getElementById('searchResults');
+
+        if (invoices.length === 0) {
+            resultsBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No invoices found</td></tr>';
+        } else {
+            resultsBody.innerHTML = invoices.map(inv => `
+                <tr>
+                    <td>${inv.invoiceNumber}</td>
+                    <td>${new Date(inv.saleDate).toLocaleDateString()}</td>
+                    <td>${inv.customerName || 'Walk-in Customer'}</td>
+                    <td>${inv.totalAmount.toFixed(2)} EGP</td>
+                    <td>${inv.itemsCount}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="selectInvoice(${inv.id})">
+                            <i class="fas fa-arrow-right me-1"></i>Select
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        resultsSection.style.display = 'block';
+    }
+
+    // Select invoice and load its items
+    function selectInvoice(invoiceId) {
+        selectedInvoiceId = invoiceId;
+
+        fetch(`/Returns/GetInvoiceDetails/${invoiceId}`)
+            .then(response => response.json())
+            .then(data => {
+                displayInvoiceDetails(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error loading invoice details');
+            });
+    }
+
+    // Display invoice details and items
+    function displayInvoiceDetails(invoice) {
+        // Set invoice info
+        document.getElementById('selectedInvoiceNo').textContent = invoice.invoiceNumber;
+        document.getElementById('selectedInvoiceDate').textContent = new Date(invoice.saleDate).toLocaleDateString();
+        document.getElementById('selectedCustomerName').textContent = invoice.customerName || 'Walk-in Customer';
+        document.getElementById('selectedCashier').textContent = invoice.sellerName;
+
+        // Store items
+        invoiceItems = invoice.items;
+
+        // Display items
+        const itemsBody = document.getElementById('invoiceItemsBody');
+        itemsBody.innerHTML = invoiceItems.map((item, index) => `
+            <tr id="row-${index}">
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input" id="check-${index}" 
+                           onchange="toggleItem(${index})" ${item.soldQty === 0 ? 'disabled' : ''}>
+                </td>
+                <td>
+                    <strong>${item.productCode}</strong><br>
+                    <small class="text-muted">${item.productName}</small>
+                </td>
+                <td>
+                    <span style="display:inline-block;width:30px;height:30px;background-color:${item.color};border:1px solid #ddd;border-radius:4px;"></span>
+                </td>
+                <td>${item.size}</td>
+                <td>${item.sellingPrice.toFixed(2)} EGP</td>
+                <td>${item.soldQty}</td>
+                <td>${item.discount.toFixed(2)} EGP</td>
+                <td>
+                    <input type="number" class="form-control form-control-sm" id="qty-${index}" 
+                           min="0" max="${item.soldQty}" value="0" 
+                           onchange="updateReturnQty(${index})" 
+                           ${item.soldQty === 0 ? 'disabled' : ''}>
+                </td>
+                <td id="refund-${index}">0.00 EGP</td>
+            </tr>
+        `).join('');
+
+        // Show return section, hide search section
+        document.getElementById('searchSection').style.display = 'none';
+        document.getElementById('returnSection').style.display = 'block';
+        
+        // Reset total
+        updateTotalRefund();
+    }
+
+    // Toggle item selection
+    function toggleItem(index) {
+        const checkbox = document.getElementById(`check-${index}`);
+        const qtyInput = document.getElementById(`qty-${index}`);
+        
+        if (checkbox.checked) {
+            qtyInput.value = invoiceItems[index].soldQty;
+            qtyInput.disabled = false;
+        } else {
+            qtyInput.value = 0;
+            qtyInput.disabled = true;
+        }
+        
+        updateReturnQty(index);
+    }
+
+    // Update return quantity and refund amount
+    function updateReturnQty(index) {
+        const qtyInput = document.getElementById(`qty-${index}`);
+        const checkbox = document.getElementById(`check-${index}`);
+        const qty = parseInt(qtyInput.value) || 0;
+        const item = invoiceItems[index];
+
+        // Validate quantity
+        if (qty > item.soldQty) {
+            qtyInput.value = item.soldQty;
+            return;
+        }
+
+        // Update checkbox
+        checkbox.checked = qty > 0;
+
+        // Calculate refund amount
+        const refundAmount = (item.sellingPrice * qty) - (item.discount * qty / item.soldQty);
+        document.getElementById(`refund-${index}`).textContent = refundAmount.toFixed(2) + ' EGP';
+
+        // Update item refund data
+        item.returnQty = qty;
+        item.refundAmount = refundAmount;
+
+        updateTotalRefund();
+    }
+
+    // Update total refund amount
+    function updateTotalRefund() {
+        const total = invoiceItems.reduce((sum, item) => sum + (item.refundAmount || 0), 0);
+        document.getElementById('totalRefund').textContent = total.toFixed(2);
+    }
+
+    // Save return (show confirmation)
+    function saveReturn() {
+        const itemsToReturn = invoiceItems.filter(item => (item.returnQty || 0) > 0);
+
+        if (itemsToReturn.length === 0) {
+            alert('Please select at least one item to return');
+            return;
+        }
+
+        const totalRefund = itemsToReturn.reduce((sum, item) => sum + item.refundAmount, 0);
+
+        document.getElementById('confirmRefundAmount').textContent = totalRefund.toFixed(2);
+        document.getElementById('confirmItemCount').textContent = itemsToReturn.length;
+
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        modal.show();
+    }
+
+    // Confirm and process return
+    function confirmReturn() {
+        const itemsToReturn = invoiceItems.filter(item => (item.returnQty || 0) > 0);
+        const notes = document.getElementById('returnNotes').value;
+
+        const returnData = {
+            salesInvoiceId: selectedInvoiceId,
+            notes: notes,
+            items: itemsToReturn.map(item => ({
+                salesItemId: item.id,
+                quantity: item.returnQty,
+                refundAmount: item.refundAmount
+            }))
+        };
+
+        fetch('/Returns/ProcessReturn', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(returnData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                createdReturnInvoiceId = data.returnInvoiceId;
+                document.getElementById('returnInvoiceNo').textContent = data.invoiceNumber;
+                
+                // Hide confirm modal
+                bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+                
+                // Show success modal
+                const printModal = new bootstrap.Modal(document.getElementById('printModal'));
+                printModal.show();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error processing return');
+        });
+    }
+
+    // Print return receipt
+    function printReturnReceipt() {
+        if (createdReturnInvoiceId) {
+            window.open(`/Returns/PrintReceipt/${createdReturnInvoiceId}`, '_blank');
+        }
+    }
+
+    // Finish return and reset
+    function finishReturn() {
+        bootstrap.Modal.getInstance(document.getElementById('printModal')).hide();
+        resetReturn();
+        // Clear search fields
+        document.getElementById('searchInvoiceNo').value = '';
+        document.getElementById('searchProduct').value = '';
+        document.getElementById('searchDateFrom').value = '';
+        document.getElementById('searchDateTo').value = '';
+        document.getElementById('searchResults').style.display = 'none';
+    }
+
+    // Reset return section
+    function resetReturn() {
+        selectedInvoiceId = null;
+        invoiceItems = [];
+        createdReturnInvoiceId = null;
+        document.getElementById('returnNotes').value = '';
+        document.getElementById('searchSection').style.display = 'block';
+        document.getElementById('returnSection').style.display = 'none';
+    }
+</script>

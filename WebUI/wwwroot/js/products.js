@@ -617,16 +617,31 @@ document.addEventListener('DOMContentLoaded', () => {
                         variantRow.className = 'variant-row d-flex gap-2 align-items-center';
                         variantRow.dataset.variantId = variantCounter;
                         variantRow.dataset.dbVariantId = v.id || 0; // Store DB ID
+                        
+                        // Convert hex to color name for display
+                        let colorName = '';
+                        let colorHex = v.color || '';
+                        
+                        // If v.color is a hex value, find the matching color name
+                        if (colorHex && typeof getColorNameFromHex === 'function') {
+                            colorName = getColorNameFromHex(colorHex);
+                        }
+                        
+                        // If we couldn't find a name, show hex as fallback
+                        if (!colorName) {
+                            colorName = colorHex;
+                        }
+                        
                         variantRow.innerHTML = `
                             <div style="flex: 0 0 150px;">
                                 <label class="form-label mb-1 small text-muted">Color</label>
                                 <div class="position-relative">
                                     <input type="text" class="form-control form-control-sm variant-color-name" 
                                            id="variant-color-${variantCounter}" placeholder="Select color..." 
-                                           value="${v.color || ''}" required>
+                                           value="${colorName}" required>
                                     <div class="dropdown-menu" id="variant-color-dropdown-${variantCounter}" 
                                          style="max-height: 200px; overflow-y: auto;"></div>
-                                    <input type="hidden" class="variant-color-hex" id="variant-color-hex-${variantCounter}">
+                                    <input type="hidden" class="variant-color-hex" id="variant-color-hex-${variantCounter}" value="${colorHex}">
                                 </div>
                             </div>
                             <div style="flex: 1;">
@@ -704,14 +719,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const variantRows = variantList.querySelectorAll('.variant-row');
             variantRows.forEach(row => {
                 const colorName = row.querySelector('.variant-color-name').value;
+                const colorHex = row.querySelector('.variant-color-hex').value;
                 const size = parseInt(row.querySelector('.variant-size').value);
                 const stock = parseInt(row.querySelector('.variant-stock').value) || 0;
                 const dbVariantId = parseInt(row.dataset.dbVariantId) || 0;
                 
-                if (colorName && size) {
+                // Use hex value instead of color name for storage
+                if (colorHex && size) {
                     product.Variants.push({ 
                         Id: dbVariantId,
-                        Color: colorName, 
+                        Color: colorHex, // Store hex value, not name
                         Size: size, 
                         Stock: stock 
                     });

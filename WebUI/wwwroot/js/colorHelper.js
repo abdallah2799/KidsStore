@@ -74,6 +74,19 @@ function getColorHexFromName(name) {
 }
 
 /**
+ * Get color name from hex value
+ * @param {string} hex - Hex color code (with or without #)
+ * @returns {string} Color name or empty string if not found
+ */
+function getColorNameFromHex(hex) {
+    if (!hex) return '';
+    // Normalize hex (remove # and convert to lowercase)
+    const normalizedHex = hex.replace('#', '').toLowerCase();
+    const color = COLORS.find(c => c.hex.replace('#', '').toLowerCase() === normalizedHex);
+    return color ? color.name : '';
+}
+
+/**
  * Get all color names
  * @returns {Array<string>} Array of color names
  */

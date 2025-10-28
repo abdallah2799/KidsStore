@@ -5,25 +5,217 @@
     var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "Unknown";
 }
 
-<div class="d-flex flex-column align-items-center justify-content-center" style="height:80vh;">
-    <h1 style="font-weight:700; color:#2563eb;">@controllerName</h1>
+@section Styles {
+    <link href="~/css/sales.css" rel="stylesheet" />
+}
 
-    <p style="font-size:1.2rem; margin-top:10px;">
-        Logged in as:
-        <span style="font-weight:600; color:#16a34a;">@userName</span>
-        (<span style="color:#64748b;">@role</span>)
-    </p>
 
-    @if (User.IsInRole("Admin"))
-    {
-        <p style="color:#334155; margin-top:15px;">You have full administrative access to this module.</p>
-    }
-    else if (User.IsInRole("Cashier"))
-    {
-        <p style="color:#f59e0b; margin-top:15px;">Limited cashier access — certain actions may be restricted.</p>
-    }
-    else
-    {
-        <p style="color:#dc2626; margin-top:15px;">Unknown or unauthorized role.</p>
-    }
+<div class="container-fluid py-4" style="max-width:1200px;">
+    <!-- Top Section: Invoice Info -->
+    <div class="card mb-4 p-4 shadow-sm" style="border-radius:16px;">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Invoice No.</label>
+                <input type="text" class="form-control" value="(Auto)" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Date</label>
+                <input type="text" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" readonly>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Cashier</label>
+                <input type="text" class="form-control" value="@userName" readonly>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Customer (optional)</label>
+                <input type="text" class="form-control" id="customerInput" placeholder="Enter customer name...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-semibold">Payment Method</label>
+                <select id="paymentMethod" class="form-select">
+                    <option value="Cash" selected>Cash</option>
+                    <option value="Wallet">Wallet</option>
+                    <option value="Instapay">Instapay</option>
+                    <option value="Visa">Visa</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <h2 class="mb-4" style="color:var(--primary-color);font-weight:700;">Point of Sale</h2>
+    <div class="row">
+        <!-- Left: Product Entry & Table -->
+        <div class="col-lg-8">
+            <!-- Sales Table with inline editing -->
+            <div class="card shadow-sm" style="border-radius:16px;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="salesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width:12%;">Product Code</th>
+                                <th style="width:20%;">Name</th>
+                                <th style="width:12%;">Color</th>
+                                <th style="width:10%;">Size</th>
+                                <th style="width:12%;">Unit Price</th>
+                                <th style="width:8%;">Qty</th>
+                                <th style="width:10%;">Discount (%)</th>
+                                <th style="width:12%;">Total</th>
+                                <th style="width:4%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            <!-- Initial empty row for adding products -->
+                            <tr class="product-row" data-row-index="0">
+                                <td>
+                                    <input type="text" class="form-control form-control-sm product-code-input" placeholder="Enter code..." autocomplete="off">
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control form-control-sm product-name-display" readonly placeholder="Auto-filled">
+                                </td>
+                                <td class="position-relative">
+                                    <div class="d-flex align-items-center">
+                                        <div class="color-swatch me-2" style="width:20px;height:20px;border:1px solid #ddd;border-radius:50%;background:#fff;cursor:pointer;"></div>
+                                        <input type="text" class="form-control form-control-sm color-input color-select" placeholder="Color" disabled autocomplete="off">
+                                        <input type="hidden" class="color-hex-input">
+                                    </div>
+                                    <div class="color-dropdown dropdown-menu" style="max-height:300px;overflow-y:auto;"></div>
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm size-select" disabled>
+                                        <option value="">Select</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm unit-price-display" readonly placeholder="0.00">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm quantity-input" min="1" value="1">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm discount-input" min="0" max="100" value="0">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control form-control-sm total-display" readonly placeholder="0.00">
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger remove-row-btn" disabled><i class="fa fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3">
+                    <button id="addRowBtn" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> Add Product</button>
+                    <div id="discountWarning" class="mt-2 text-danger fw-semibold" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Actions & Summary -->
+        <div class="col-lg-4">
+            <div class="card mb-4 p-4 shadow-sm" style="border-radius:16px;">
+                <h5 class="fw-bold mb-3">Summary</h5>
+                <div class="mb-2 d-flex justify-content-between">
+                    <span>Subtotal:</span>
+                    <span id="subtotal" class="fw-semibold">0.00 EGP</span>
+                </div>
+                <div class="mb-2 d-flex justify-content-between">
+                    <span>Total Discount:</span>
+                    <span id="totalDiscount" class="fw-semibold text-danger">0.00 EGP</span>
+                </div>
+                <hr class="my-3">
+                <div class="mb-3 d-flex justify-content-between">
+                    <span class="fs-5 fw-bold">Net Total:</span>
+                    <span id="netTotal" class="fs-5 fw-bold text-primary">0.00 EGP</span>
+                </div>
+                <hr class="my-3">
+                <div class="mb-2">
+                    <label class="form-label fw-semibold">Amount Paid:</label>
+                    <input type="number" id="amountPaid" class="form-control" min="0" step="0.01" value="0" placeholder="Enter amount...">
+                </div>
+                <div class="mb-2 d-flex justify-content-between align-items-center p-2" style="background:#f8f9fa;border-radius:8px;">
+                    <span class="fw-semibold">Change:</span>
+                    <span id="change" class="fs-5 fw-bold text-success">0.00 EGP</span>
+                </div>
+            </div>
+            <div class="card p-4 shadow-sm" style="border-radius:16px;">
+                <div class="d-grid gap-2">
+                    <button id="saveInvoiceBtn" class="btn btn-success btn-lg fw-bold"><i class="fa fa-check-circle"></i> Save Invoice</button>
+                    <button id="cancelInvoiceBtn" class="btn btn-secondary btn-lg fw-bold"><i class="fa fa-times-circle"></i> Cancel Invoice</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Modal: Save Confirmation -->
+<div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-labelledby="saveConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="saveConfirmModalLabel"><i class="fa fa-question-circle"></i> Confirm Save</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Do you really want to save this invoice?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-success" id="confirmSaveBtn">Yes, Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Receipt Generation -->
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="receiptModalLabel"><i class="fa fa-receipt"></i> Generate Receipt</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Invoice saved successfully! Do you want to generate a receipt?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="skipReceiptBtn">No, Skip</button>
+                <button type="button" class="btn btn-primary" id="generateReceiptBtn"><i class="fa fa-print"></i> Yes, Open Receipt</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Product Search -->
+<div class="modal fade" id="productSearchModal" tabindex="-1" aria-labelledby="productSearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productSearchModalLabel">Search Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="searchProductInput" class="form-control mb-3" placeholder="Search by name or code...">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Base Price</th>
+                                <th>Max Discount (%)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchProductTableBody">
+                            <!-- Search results here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/sales.js"></script>
+}
